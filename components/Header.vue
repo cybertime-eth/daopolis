@@ -2,44 +2,22 @@
   <header>
     <div class="header container-xl">
       <div class="header__logo">
-        <img src="/logo.svg" alt="logo" class="header__logo-img">
-        <nuxt-link to="/" class="header__logo-link">CyberBox</nuxt-link>
+        <img src="/logo.png" alt="logo" class="header__logo-img">
+        <nuxt-link to="/" class="header__logo-link">DAOPOLIS</nuxt-link>
       </div>
-      <nav class="header__navigation">
-        <ul class="header__ul">
-          <li class="header__list">
-            <nuxt-link class="header__link gradient-text" to="#">Marketplace</nuxt-link>
-          </li>
-          <li class="header__list">
-            <nuxt-link class="header__link" to="#">Minted Box</nuxt-link>
-          </li>
-          <li class="header__list">
-            <nuxt-link class="header__link" to="#">Rankings</nuxt-link>
-          </li>
-          <li class="header__list">
-            <nuxt-link class="header__link" to="#">About</nuxt-link>
-          </li>
-        </ul>
-      </nav>
-      <button class="header__box gradient-button" v-if="address" @click="$router.push('/createbox')">
-        Create Box
+      <button class="header__box">
+        My collection
       </button>
-      <button v-else></button>
-      <div class="header__wallet" v-if="address" @click="showProfileMenu = true">
+      <div class="header__wallet" v-if="address">
         <h3 class="header__wallet-address">{{ address }}</h3>
-        <div class="header__wallet-avatar gradient-button">
-          <img :src="user.image" alt="avatar" v-if="user.image">
-        </div>
       </div>
-      <button class="gradient-button header__connect" v-else @click="showConnectModal = true">Connect Wallet</button>
+      <button class="header__connect" v-else @click="showConnectModal = true">Connect Wallet</button>
     </div>
     <connect v-if="showConnectModal && !address" @closeModal="closeModal"/>
-    <profileModal v-if="showProfileMenu" @closeModal="closeModal"/>
   </header>
 </template>
 <script>
 import connect from '@/components/modals/connect'
-import profileModal from '@/components/modals/profileModal'
 export default {
   data() {
     return {
@@ -50,7 +28,6 @@ export default {
   },
   components: {
     connect,
-    profileModal
   },
   computed: {
     user() {
@@ -75,18 +52,22 @@ header {
 .header {
   height: 9.5rem;
   display: grid;
-  grid-template-columns: 32rem 42rem 35.3rem 22.5rem;
+  grid-template-columns: 88rem 14rem 20rem;
   align-items: center;
+  justify-content: space-between;
   &__logo {
     display: flex;
     align-items: center;
     width: 14.9rem;
     justify-content: space-between;
     &-link {
+      font-family: Orbitron-Black;
       letter-spacing: 0.04em;
+      font-size: 2.4rem;
+      padding-left: 1.5rem;
     }
     &-img {
-      width: 6rem;
+      width: 3rem;
     }
   }
   &__ul {
@@ -99,38 +80,15 @@ header {
     cursor: pointer;
   }
   &__wallet {
-    background: #E9FCEE;
+    background: $modalColor;
     border-radius: 2.5rem;
     width: 19.7rem;
     height: 4.8rem;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     justify-self: end;
     cursor: pointer;
-    position: relative;
-    z-index: 1;
-    &-address {
-      padding-left: 2.2rem;
-    }
-
-    &-avatar {
-      width: 4.2rem;
-      height: 4.5rem;
-      border-radius: 2.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      &::after {
-        border-radius: 50% !important;
-      }
-      img {
-        width: 4.2rem;
-        height: 4.5rem;
-        object-fit: cover;
-        border-radius: 2.5rem;
-      }
-    }
   }
   &__connect {
     width: 17.4rem;

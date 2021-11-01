@@ -1,9 +1,9 @@
 {
-  "name": "cyberbox",
+  "name": "daopolis",
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "nuxt --port 5000",
+    "dev": "nuxt --port 5002",
     "build": "nuxt build",
     "start": "nuxt start",
     "generate": "nuxt generate"

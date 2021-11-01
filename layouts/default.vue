@@ -18,32 +18,6 @@ export default {
 </script>
 <style lang="scss">
 
-.gradient-button {
-  position: relative;
-  background-clip: padding-box;
-  background: #fff;
-  color: $pink;
-  justify-self: end;
-  border-radius: 2.3rem;
-  letter-spacing: 0.04em;
-  border: .1rem solid transparent;
-  &::after {
-    position: absolute;
-    top: -.2rem; bottom: -.2rem;
-    left: -.2rem; right: -.2rem;
-    background: linear-gradient(93.06deg, #FC2EF5 8.21%, #5489D8 50.57%, #2CFF64 100%);
-    content: '';
-    z-index: -1;
-    border-radius: 2.3rem;
-  }
-}
-
-.gradient-text {
-  background: linear-gradient(93.06deg, #FC2EF5 8.21%, #5489D8 50.57%, #2CFF64 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
 //DEFAULT STYLES
 
 html,
@@ -55,6 +29,7 @@ body {
   overflow-x: hidden;
   font-size: var(--fontSize);
   scroll-behavior: smooth;
+  background: $backgroundBody;
 }
 h1,h2,h3,h4,h5,h6,p,span,a {
   margin: 0;
@@ -80,11 +55,12 @@ h4 {
   font-size: 1.3rem;
 }
 button {
-  border-style: none;
   font-size: 1.6rem;
   border-radius: 2.5rem;
   color: $textColor;
   font-family: OpenSans-SemiBold;
+  background: none;
+  border: .1rem solid $green;
   padding: 0;
 }
 a {

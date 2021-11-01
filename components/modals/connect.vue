@@ -41,7 +41,7 @@ export default {
     padding-top: 4.4rem;
     &-button {
       margin-bottom: 1.4rem;
-      background: $white;
+      background: $modalColor;
       border-radius: .4rem;
       display: flex;
       align-items: center;
