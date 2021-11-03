@@ -1,0 +1,150 @@
+<template>
+  <section class="collection">
+    <h1 class="collection__title">My Collection</h1>
+    <div class="collection__empty" v-if="empty">
+      <h3 class="collection__empty-title">You don't have NFT Daopolis yet</h3>
+      <button class="collection__empty-button" @click="$router.push('/')">Buy</button>
+    </div>
+    <div class="collection__items" v-else>
+      <div class="collection__item">
+        <img src="/item-null.png" alt="item" class="collection__item-image">
+        <div class="collection__item-info">
+          <h2 class="collection__item-info-name">
+            Daopolis #11111
+          </h2>
+          <div class="collection__item-info-buttons">
+            <button class="collection__item-info-buttons-transfer" @click="showTransfer = true">Transfer</button>
+            <button class="collection__item-info-buttons-open" @click="showPurchased = true">Open</button>
+          </div>
+        </div>
+      </div>
+      <div class="collection__item">
+        <img src="/item-null.png" alt="item" class="collection__item-image">
+        <div class="collection__item-info">
+          <h2 class="collection__item-info-name">
+            Daopolis #11111
+          </h2>
+          <div class="collection__item-info-buttons">
+            <button class="collection__item-info-buttons-transfer" @click="showTransfer = true">Transfer</button>
+            <button class="collection__item-info-buttons-open" @click="showPurchased = true">Open</button>
+          </div>
+        </div>
+      </div>
+      <div class="collection__item">
+        <img src="/item-1.png" alt="item" class="collection__item-image">
+        <div class="collection__item-info">
+          <h2 class="collection__item-info-name">
+            Daopolis #11111
+          </h2>
+          <div class="collection__item-info-buttons">
+            <button class="collection__item-info-buttons-transfer collection__item-info-buttons-transfer-open" @click="showTransfer = true">Transfer</button>
+          </div>
+        </div>
+      </div>
+      <div class="collection__item">
+        <img src="/item-1.png" alt="item" class="collection__item-image">
+        <div class="collection__item-info">
+          <h2 class="collection__item-info-name">
+            Daopolis #11111
+          </h2>
+          <div class="collection__item-info-buttons">
+            <button class="collection__item-info-buttons-transfer collection__item-info-buttons-transfer-open" @click="showTransfer = true">Transfer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <Transfer @closeModal="closeModal" v-if="showTransfer"/>
+    <Purchased @closeModal="closeModal" v-if="showPurchased" :openCard="true"/>
+  </section>
+</template>
+<script>
+import Transfer from '@/components/modals/transfer'
+import Purchased from '@/components/modals/purchased'
+export default {
+  data() {
+    return {
+      empty: false,
+      showTransfer: false,
+      showPurchased: false
+    }
+  },
+  methods: {
+    closeModal(payload) {
+      this.showTransfer = payload
+      this.showPurchased = payload
+    }
+  },
+  components: {
+    Transfer,
+    Purchased
+  }
+}
+</script>
+<style lang="scss">
+.collection {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding-top: 4.2rem;
+  padding-bottom: 20rem;
+  &__title {
+    font-family: Cabin-Bold;
+  }
+  &__empty {
+    padding-top: 6rem;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    &-button {
+      margin-top: 2rem;
+      width: 18.4rem;
+      height: 4.8rem;
+      background: $green;
+      cursor: pointer;
+    }
+  }
+  &__items {
+    display: grid;
+    grid-template-columns: 28.2rem 28.2rem 28.2rem 28.2rem;
+    grid-column-gap: 2rem;
+    padding-top: 4.8rem;
+  }
+  &__item {
+    width: 28.2rem;
+    height: 42.3rem;
+    background: $modalColor;
+    border-radius: .4rem;
+    &-image {
+      width: 28.2rem;
+      height: 28.2rem;
+      object-fit: cover;
+    }
+    &-info {
+      padding: 1.3rem 1.6rem 3.4rem;
+      &-name {
+        font-size: 2.2rem;
+      }
+      &-buttons {
+        padding-top: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        &-transfer {
+          width: 7.4rem;
+          height: 3.2rem;
+          border: .1rem solid $buttonDark;
+          border-radius: 0;
+          font-size: 1.4rem;
+          &-open {
+            margin-top: .6rem;
+          }
+        }
+        &-open {
+          width: 12.3rem;
+          height: 4.3rem;
+        }
+      }
+    }
+  }
+}
+</style>

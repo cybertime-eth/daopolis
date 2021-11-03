@@ -5,9 +5,12 @@
         <img src="/logo.png" alt="logo" class="header__logo-img">
         <nuxt-link to="/" class="header__logo-link">DAOPOLIS</nuxt-link>
       </div>
-      <button class="header__box">
-        My collection
-      </button>
+      <nuxt-link to="/collection"  v-if="address">
+        <button class="header__box">
+          My collection
+        </button>
+      </nuxt-link>
+      <div v-else></div>
       <div class="header__wallet" v-if="address">
         <h3 class="header__wallet-address">{{ address }}</h3>
       </div>
@@ -52,7 +55,7 @@ header {
 .header {
   height: 9.5rem;
   display: grid;
-  grid-template-columns: 88rem 14rem 20rem;
+  grid-template-columns: 72.5rem 14rem 20rem;
   align-items: center;
   justify-content: space-between;
   &__logo {
@@ -62,12 +65,11 @@ header {
     justify-content: space-between;
     &-link {
       font-family: Orbitron-Black;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.1em;
       font-size: 2.4rem;
-      padding-left: 1.5rem;
     }
     &-img {
-      width: 3rem;
+      width: 6rem;
     }
   }
   &__ul {
@@ -75,7 +77,7 @@ header {
     justify-content: space-between;
   }
   &__box {
-    width: 13.9rem;
+    width: 18.4rem;
     height: 4.8rem;
     cursor: pointer;
   }
@@ -91,7 +93,7 @@ header {
     cursor: pointer;
   }
   &__connect {
-    width: 17.4rem;
+    width: 17.9rem;
     height: 4.8rem;
     cursor: pointer;
   }

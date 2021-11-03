@@ -2,8 +2,6 @@ import Web3 from 'web3'
 import { ethers, Wallet, providers } from 'ethers'
 import WalletConnectProvider from "@walletconnect/web3-provider";
 export const state = () => ({
-  user: {},
-  chainId: null,
   address: null
 })
 export const actions = {
@@ -79,9 +77,6 @@ export const actions = {
   }
 }
 export const mutations = {
-  setUser(state, user) {
-    state.user = user
-  },
   setAddress(state,address) {
     localStorage.setItem('address', address)
     const startID = address.split("").slice(0, 6);

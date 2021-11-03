@@ -8,7 +8,7 @@
 import Header from './../components/Header'
 export default {
   components: {
-    Header
+    Header,
   },
  async mounted() {
     await this.$store.dispatch('updateUser')
@@ -38,7 +38,7 @@ h1,h2,h3,h4,h5,h6,p,span,a {
 }
 h1 {
   font-size: 3.2rem;
-  font-family: Cabin-Bold;
+  font-family: Orbitron-Black;
 }
 h2 {
   font-size: 2rem;
@@ -46,6 +46,7 @@ h2 {
 a,h3 {
   font-size: 1.6rem;
   font-weight: 600;
+  letter-spacing: 0.03em;
 }
 p {
   font-size: 1.4rem;
@@ -62,6 +63,7 @@ button {
   background: none;
   border: .1rem solid $green;
   padding: 0;
+  cursor: pointer;
 }
 a {
   text-decoration: none;
@@ -84,14 +86,14 @@ input,textarea {
   resize: none;
   font-family: OpenSans-Regular;
   &::placeholder {
-    color: $border2;
+    color: $placeholderText;
   }
 }
 ul {
   margin: 0;
 }
 .container-xl {
-  width: 132rem;
+  width: 120rem;
   margin: 0 auto;
 }
 .container-l {
@@ -103,11 +105,11 @@ ul {
 
 ::-webkit-scrollbar {
   width: 9px;
-  background: #fff;
+  background: $backgroundBody;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #000;
+  background: #fff;
   cursor: pointer;
 }
 
@@ -148,14 +150,20 @@ ul {
 //FONTS
 
 @font-face {
-  font-family: "Cabin-Bold";
-  src: local("Cabin-Bold"),
-  url(./assets/fonts/Cabin-Bold.ttf) format('truetype');
+  font-family: 'Orbitron-Black';
+  src: local("Orbitron-Black"),
+  url(./assets/fonts/Orbitron-Black.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: "Orbitron-Bold";
+  src: local("Orbitron-Bold"),
+  url(./assets/fonts/Orbitron-Bold.ttf) format('truetype');
 }
 @font-face {
-  font-family: "Cabin-Medium";
-  src: local("Cabin-Medium"),
-  url(./assets/fonts/Cabin-Medium.ttf) format('truetype');
+  font-family: "Orbitron-Medium";
+  src: local("Orbitron-Medium"),
+  url(./assets/fonts/Orbitron-Medium.ttf) format('truetype');
 }
 @font-face {
   font-family: 'OpenSans-Bold';
@@ -183,8 +191,18 @@ ul {
   url(./assets/fonts/OpenSans-Regular.ttf) format('truetype');
 }
 @font-face {
-  font-family: 'Orbitron-Black';
-  src: local("Orbitron-Black"),
-  url(./assets/fonts/Orbitron-Black.ttf) format('truetype');
+  font-family: 'Cabin-Regular';
+  src: local("Cabin-Regular"),
+  url(./assets/fonts/Cabin-Regular.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Cabin-Bold';
+  src: local("Cabin-Bold"),
+  url(./assets/fonts/Cabin-Bold.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Cabin-Medium';
+  src: local("Cabin-Medium"),
+  url(./assets/fonts/Cabin-Medium.ttf) format('truetype');
 }
 </style>
