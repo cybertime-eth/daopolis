@@ -1,6 +1,7 @@
 import Web3 from 'web3'
 import { ethers, Wallet, providers } from 'ethers'
 import WalletConnectProvider from "@walletconnect/web3-provider";
+import { newKit } from "@celo/contractkit";
 export const state = () => ({
   address: null
 })
@@ -12,19 +13,6 @@ export const actions = {
       const signer = await provider.getSigner()
       const address = await signer.getAddress()
       commit('setAddress', address)
-    }
-  },
-  reloadOnAccChange({commit}) {
-    try {
-      if (window.ethereum) {
-        const ethereum = window.ethereum;
-        ethereum.autoRefreshOnNetworkChange = false;
-        ethereum.on("accountsChanged", (accounts) => {
-          commit('setAddress', accounts[0])
-        });
-      }
-    } catch (error) {
-      console.log("Something went wrong!", error);
     }
   },
   async connectMetaTrust({commit}) {
@@ -65,6 +53,15 @@ export const actions = {
     }
     window.web3 = new Web3(provider);
   },
+  // async buyNft({commit, state}) {
+  //   const kit = newKit("https://alfajores-forno.celo-testnet.org");
+  //   let contract = new kit.web3.eth.Contract(ERC20, '0xc4ea80deCA2415105746639eC16cB0cF8378996A')
+  //   console.log(contract)
+  //
+  //   const res = await contract.methods.adoptDaos(1)
+  //   console.log(res)
+  //
+  // },
   async logout({commit}) {
     try {
       commit('setAddress', '')

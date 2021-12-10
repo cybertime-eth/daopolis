@@ -44,6 +44,11 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    cache: false
+    cache: false,
+    extend(config, {}) {
+      config.node = {
+        fs: 'empty'
+      }
+    }
   }
 }
