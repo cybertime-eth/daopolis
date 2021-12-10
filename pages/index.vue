@@ -1,14 +1,14 @@
 <template>
   <section id="home">
     <div class="home container-xl">
-      <video autoplay loop  src="/daopolis-movie.MP4" class="home__image"></video>
+      <video src="/daopolis-movie.MP4" class="home__image" autoplay muted loop></video>
       <div class="home__main" v-if="currentStep === 1">
         <h1 class="home__main-name">Meet Daopolis Citizens</h1>
         <h3 class="home__main-description">Automatically generated 9192 NFT's. Born in the CyberTime era, Daopolis
           citizens will be the foundation of a new gaming metaverse on Celo. Find your digital avatar, gain access
           to a private club and participate in unique NFT games!</h3>
         <h3 class="home__main-minted">Access to the whitelist allows minting NFTs from just 2 CELO. Get on the list today!</h3>
-        <button class="home__main-buy" @click="currentStep = 2">Get access to whitelist</button>
+        <a href="https://t.co/t5mrtZplWN" target="_blank"><button class="home__main-buy" >Get access to whitelist</button></a>
       </div>
       <div class="home__info" v-else>
         <h1 class="home__info-name">Meet Daopolis Citizens</h1>

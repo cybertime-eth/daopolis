@@ -5,18 +5,18 @@
         <img src="/logo.png" alt="logo" class="header__logo-img">
         <nuxt-link to="/" class="header__logo-link">DAOPOLIS</nuxt-link>
       </div>
-      <nuxt-link to="/collection"  v-if="address">
-        <button class="header__box">
-          My collection
-        </button>
-      </nuxt-link>
-      <div v-else></div>
-      <div class="header__wallet" v-if="address">
-        <h3 class="header__wallet-address">{{ address }}</h3>
-      </div>
-      <button class="header__connect" v-else @click="showConnectModal = true">Connect Wallet</button>
+<!--      <nuxt-link to="/collection"  v-if="address">-->
+<!--        <button class="header__box">-->
+<!--          My collection-->
+<!--        </button>-->
+<!--      </nuxt-link>-->
+<!--      <div v-else></div>-->
+<!--      <div class="header__wallet" v-if="address">-->
+<!--        <h3 class="header__wallet-address">{{ address }}</h3>-->
+<!--      </div>-->
+<!--      <button class="header__connect" v-else @click="showConnectModal = true">Connect Wallet</button>-->
     </div>
-    <connect v-if="showConnectModal && !address" @closeModal="closeModal"/>
+<!--    <connect v-if="showConnectModal && !address" @closeModal="closeModal"/>-->
   </header>
 </template>
 <script>
@@ -55,14 +55,13 @@ header {
 .header {
   height: 9.5rem;
   display: grid;
-  grid-template-columns: 72.5rem 14rem 20rem;
+  //grid-template-columns: 72.5rem 14rem 20rem;
+  grid-template-columns: 1fr;
   align-items: center;
   justify-content: space-between;
   &__logo {
     display: flex;
     align-items: center;
-    width: 14.9rem;
-    justify-content: space-between;
     &-link {
       font-family: Orbitron-Black;
       letter-spacing: 0.1em;
@@ -70,6 +69,7 @@ header {
     }
     &-img {
       width: 6rem;
+      margin-right: 1rem;
     }
   }
   &__ul {
