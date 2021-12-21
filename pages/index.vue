@@ -237,6 +237,7 @@ export default {
   }
 
   @media(max-width: 460px) {
+    // mobile responsive
     display: block;
     width: 94%;
     padding-top: 2rem;
