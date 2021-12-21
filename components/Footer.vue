@@ -70,4 +70,19 @@ footer {
     }
   }
 }
+
+@media(max-width: 460px) {
+  .footer {
+    width: 100%;
+    flex-wrap: wrap;
+    &__links {
+      &-list {
+        padding-left: 1.6rem;
+      }
+      &-link {
+        font-size: 1.3rem;
+      }
+    }
+  }
+}
 </style>

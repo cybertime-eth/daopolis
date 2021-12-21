@@ -109,6 +109,7 @@ export default {
   justify-content: space-between;
   padding-top: 4.8rem;
   padding-bottom: 18rem;
+  flex-wrap: wrap;
   &__image {
     width: 48.6rem;
     border: .2rem solid $green;
@@ -232,6 +233,55 @@ export default {
       height: 5.8rem;
       border-radius: 3rem;
       font-size: 1.8rem;
+    }
+  }
+
+  @media(max-width: 460px) {
+    display: block;
+    width: 94%;
+    padding-top: 2rem;
+    padding-bottom: 13rem;
+    &__image {
+      width: 94%;
+    }
+    &__main {
+      padding-top: 3.6rem;
+      &-name, &-description, &-minted {
+        text-align: center;
+      }
+      &-description {
+        padding-top: 8px;
+        line-height: 20px;
+        font-size: 1.6rem;
+        font-weight: normal;
+      }
+      &-minted {
+        padding-top: 3.6rem;
+        font-size: 1.8rem;
+      }
+    }
+    &__info {
+      padding-top: 3.6rem;
+      &-name, &-description, &-minted {
+        text-align: center;
+      }
+      &-minted {
+        padding-top: 3.6rem;
+      }
+      &-price {
+        justify-content: center;
+      }
+      &-select-title {
+        font-size: 1.6rem;
+      }
+      &-select-buttons {
+        &-button {
+          flex: 1;
+          &:last-child {
+            margin: 0;
+          }
+        }
+      }
     }
   }
 }
