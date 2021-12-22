@@ -8,7 +8,7 @@
           citizens will be the foundation of a new gaming metaverse on Celo. Find your digital avatar, gain access
           to a private club and participate in unique NFT games!</h3>
         <h3 class="home__main-minted">Access to the whitelist allows minting NFTs from just 2 CELO. Get on the list today!</h3>
-        <a href="https://t.co/t5mrtZplWN" target="_blank"><button class="home__main-buy" >Get access to whitelist</button></a>
+        <a href="https://discord.gg/cKcWfCux4s" target="_blank"><button class="home__main-buy" >Get into whitelist</button></a>
       </div>
       <div class="home__info" v-else>
         <h1 class="home__info-name">Meet Daopolis Citizens</h1>
