@@ -2,7 +2,7 @@
   <section id="home">
     <div class="home container-xl">
       <video src="/daopolis-movie.MP4" class="home__image" autoplay muted loop></video>
-      <div class="home__main" v-if="currentStep === 1">
+      <div class="home__main" v-if="currentStep === 0">
         <h1 class="home__main-name">Meet Daopolis Citizens</h1>
         <h3 class="home__main-description">Automatically generated 9192 NFT's. Born in the CyberTime era, Daopolis
           citizens will be the foundation of a new gaming metaverse on Celo. Find your digital avatar, gain access
@@ -40,7 +40,7 @@
           </div>
         </div>
         <div class="home__info-price"><img src="/celo.png" alt="celo"><h3>2 CELO</h3></div>
-        <div class="home__info-select">
+        <div class="home__info-select" v-if="isConnected">
           <p class="home__info-select-title">Select the amount of NFT you want to buy</p>
           <div class="home__info-select-buttons">
             <button class="home__info-select-buttons-button">1</button>
@@ -49,11 +49,13 @@
             <button class="home__info-select-buttons-button">20</button>
           </div>
         </div>
-        <button class="home__info-buy" @click="showAlertPurchased = true">Buy now</button>
+		<button class="home__info-connect" @click="showConnectModal = true" v-if="!isConnected">Connect Wallet</button>
+        <button class="home__info-buy" @click="showAlertPurchased = true" v-else>Buy now</button>
       </div>
     </div>
     <Footer />
     <Loading v-if="showAlertLoad" @closeModal="closeModal" />
+	<connect v-if="showConnectModal && !isConnected" @closeModal="closeModal"/>
     <Error v-if="showAlertError" @closeModal="closeModal" />
     <Purchased v-if="showAlertPurchased" @closeModal="closeModal" :openCard="false" :countCards="countCards"/>
   </section>
@@ -61,13 +63,15 @@
 <script>
 import Footer from '@/components/Footer'
 import Loading from '@/components/modals/loading'
+import connect from '@/components/modals/connect'
 import Error from '@/components/modals/error'
 import Purchased from '@/components/modals/purchased'
 export default {
   data() {
     return {
       showAlertLoad: false,
-      showAlertError: false,
+	  showAlertError: false,
+	  showConnectModal: false,
       showAlertPurchased: false,
       countCards: 1,
       currentStep: 1,
@@ -76,8 +80,17 @@ export default {
       widthLine: 33,
     }
   },
+  components: {
+    connect
+  },
+  computed: {
+	isConnected() {
+	  return this.$store.state.address;
+	}
+  },
   methods: {
     closeModal(paylaod) {
+	  this.showConnectModal = paylaod
       this.showAlertLoad = paylaod
       this.showAlertError = paylaod
       this.showAlertPurchased = paylaod
@@ -200,7 +213,7 @@ export default {
         font-size: 1.8rem;
       }
     }
-    &-buy {
+    &-connect, &-buy {
       margin-top: 4rem;
       background: $green;
       width: 100%;

@@ -9,7 +9,7 @@
           <img src="/auth/metamask.svg" alt="metamask" class="modal__connect-button-image">
         </button>
         <button class="modal__connect-button" @click="connectMetaTrust">
-          TrustWallet
+          CELO Wallet
           <img src="/auth/trastwallet.svg" alt="metamask" class="modal__connect-button-image">
         </button>
         <button class="modal__connect-button" @click="connectWallet">
