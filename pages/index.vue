@@ -1,9 +1,8 @@
 <template>
   <section id="home">
     <div class="home container-xl">
-      <!-- <video src="/daopolis-movie.MP4" class="home__image" autoplay muted loop></video> -->
-	  <video src="/daopolis-movie1.MP4" class="home__image" autoplay muted loop></video>
-      <div class="home__main" v-if="currentStep === 0">
+      <video src="/daopolis-movie.MP4" class="home__image" autoplay muted loop></video>
+	    <div class="home__main" v-if="currentStep === 0">
         <h1 class="home__main-name">Meet Daopolis Citizens</h1>
         <h3 class="home__main-description">Automatically generated 9192 NFT's. Born in the CyberTime era, Daopolis
           citizens will be the foundation of a new gaming metaverse on Celo. Find your digital avatar, gain access
@@ -90,8 +89,7 @@ export default {
 	  return this.$store.state.rejectBuyNft
 	},
 	showPurchasedModal() {
-    // return this.$store.state.successPurchasedNft
-    return true
+    return this.$store.state.successPurchasedNft
 	},
 	showLoadAlertModal() {
 	  return this.showAlertLoad && !this.showErrorModal && !this.showPurchasedModal
