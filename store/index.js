@@ -76,7 +76,7 @@ export const actions = {
     }
     window.web3 = new Web3(provider);
   },
-  async getCollection({commit, state}) {
+  async getCollection({commit, state}, fetchMints = false) {
     if (state.fullAddress) {
       const web3 = new Web3(window.ethereum)
       const kit = ContractKit.newKitFromWeb3(web3)
@@ -86,7 +86,8 @@ export const actions = {
         const promises = []
         const nftPromises = []
         const nftList = []
-        result.forEach(tokenId => promises.push(contract.methods.tokenURI(tokenId).call()))
+        const fetchCount = fetchMints ? state.mintCount : result.length
+        result.slice(-fetchCount).forEach(tokenId => promises.push(contract.methods.tokenURI(tokenId).call()))
         const uriList = await Promise.all(promises)
 
         uriList.forEach(tokenURI => nftPromises.push(this.$axios.get(tokenURI)))
@@ -102,7 +103,7 @@ export const actions = {
       }
     }
   },
-  async buyNft({commit, getters, state}) {
+  async buyNft({commit, getters, state, dispatch}) {
     try {
       const web3 = new Web3(window.ethereum)
       const accounts = await web3.eth.getAccounts()
@@ -113,9 +114,10 @@ export const actions = {
         from: account,
         value: web3.utils.toWei('2')
       })
-      console.log(result)
+      console.log('mint done')
 
       getters.provider.once(result, async () => {
+        await dispatch('getCollection', true)
         commit('setSuccessPurchasedNft', true)
       })
     } catch(e) {

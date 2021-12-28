@@ -21,10 +21,14 @@ export default {
     '@/assets/var.css'
   ],
   styleResources: {
-    scss: ['@/assets/colors.scss']
+    scss: [
+      '@/assets/colors.scss',
+      '@/assets/main.scss'
+    ]
   },
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
+    '@/plugins/components.client.js'
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
