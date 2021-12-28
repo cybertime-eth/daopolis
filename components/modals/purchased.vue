@@ -11,7 +11,7 @@
       <button class="modal__block-purchased-collection" v-if="countCards !== 1 || openCard" @click="closeModal">My collection</button>
       <div class="modal__block-purchased-buttons" v-if="countCards === 1 && !openCard">
         <button class="modal__block-purchased-buttons-collection" @click="closeModal">My collection</button>
-        <button class="modal__block-purchased-buttons-open" @click="openCard = true">Open</button>
+        <!-- <button class="modal__block-purchased-buttons-open" @click="openCard = true">Open</button> -->
       </div>
     </div>
   </div>
@@ -23,6 +23,9 @@ export default {
     }
   },
   props: ['openCard', 'countCards'],
+  mounted() {
+    this.$store.dispatch('getCollection')
+  },
   methods: {
     closeModal() {
       this.$router.push('/collection')
@@ -70,7 +73,7 @@ export default {
     align-items: center;
     justify-content: space-between;
     &-collection {
-      width: 18.6rem;
+      width: 100%;
       height: 4.8rem;
     }
     &-open {

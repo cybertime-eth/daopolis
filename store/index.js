@@ -1,33 +1,56 @@
 import Web3 from 'web3'
 import { ethers, Wallet, providers } from 'ethers'
 import WalletConnectProvider from "@walletconnect/web3-provider";
+import daosABI from '../abi/daos.json'
 import { newKit } from "@celo/contractkit";
+const ContractKit = require('@celo/contractkit')
 export const state = () => ({
-  address: null
+  daosContract: '0x34d63dc2f8c5655bA6E05124B3D4a283A402CEd9',
+  fullAddress: null,
+  address: null,
+  mintCount: 5,
+  rejectBuyNft: false,
+  successPurchasedNft: false,
+  nftList: []
 })
+
+export const getters = {
+  provider() {
+    const web3 = window.web3.eth && window.web3.eth.currentProvider.connected ? window.web3.eth : window.ethereum
+    if (web3) {
+      return new ethers.providers.Web3Provider(web3);
+    } else {
+      return new Web3.providers.HttpProvider('https://alfajores-forno.celo-testnet.org')
+    }
+  }
+}
+
 export const actions = {
-  async updateUser({commit}) {
-    const web3 = window.web3.eth ? window.web3.eth.currentProvider.connected : window.web3.eth
-    const provider = new ethers.providers.Web3Provider(web3 ? web3 : window.ethereum);
+  async updateUser({getters, commit, dispatch}) {
     if (localStorage.getItem('address') && !localStorage.getItem('walletconnect')) {
-      const signer = await provider.getSigner()
-      const address = await signer.getAddress()
-      commit('setAddress', address)
+      try {
+        const signer = await getters.provider.getSigner()
+        const address = await signer.getAddress()
+        commit('setAddress', address)
+        if ($nuxt.$route.name === 'collection') {
+          dispatch('getCollection', address)
+        }
+      } catch(e) {
+        localStorage.removeItem('address')
+      }
     }
   },
-  async connectMetaTrust({commit}) {
+  async connectMetaTrust({getters, commit}) {
     try {
       if (window.ethereum) {
         await window.ethereum.request({ method: 'eth_requestAccounts' })
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const address = await provider.getSigner().getAddress();
+        const address = await getters.provider.getSigner().getAddress();
         commit('setAddress', address)
       } else if (window.web3) {
         window.web3 = new ethers.providers.Web3Provider(
           window.web3.currentProvider
         );
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const address = await provider.getSigner().getAddress();
+        const address = await getters.provider.getSigner().getAddress();
         commit('setAddress', address)
       } else {
         alert("please use web3 enabled browser.");
@@ -39,7 +62,7 @@ export const actions = {
   async walletConnect({commit}, isConnect) {
     const provider = new WalletConnectProvider({
       rpc: {
-        56: "https://bsc-dataseed1.ninicoin.io"
+        44787: "https://alfajores-forno.celo-testnet.org"
       },
       qrcodeModalOptions: {
         mobileLinks: ['metamask', 'trust', 'safepal', 'math']
@@ -53,15 +76,53 @@ export const actions = {
     }
     window.web3 = new Web3(provider);
   },
-  // async buyNft({commit, state}) {
-  //   const kit = newKit("https://alfajores-forno.celo-testnet.org");
-  //   let contract = new kit.web3.eth.Contract(ERC20, '0xc4ea80deCA2415105746639eC16cB0cF8378996A')
-  //   console.log(contract)
-  //
-  //   const res = await contract.methods.adoptDaos(1)
-  //   console.log(res)
-  //
-  // },
+  async getCollection({commit, state}) {
+    if (state.fullAddress) {
+      const web3 = new Web3(window.ethereum)
+      const kit = ContractKit.newKitFromWeb3(web3)
+      const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
+      const result = await contract.methods.tokensOfOwner(state.fullAddress).call()
+      if (result)  {
+        const promises = []
+        const nftPromises = []
+        const nftList = []
+        result.forEach(tokenId => promises.push(contract.methods.tokenURI(tokenId).call()))
+        const uriList = await Promise.all(promises)
+
+        uriList.forEach(tokenURI => nftPromises.push(this.$axios.get(tokenURI)))
+        const nftResultList = await Promise.all(nftPromises)
+
+        nftResultList.forEach(nftResult => {
+          nftList.push({
+            id: parseInt(nftResult.data.token_id),
+            ...nftResult.data
+          })
+        })
+        commit('setNftList', nftList)
+      }
+    }
+  },
+  async buyNft({commit, getters, state}) {
+    try {
+      const web3 = new Web3(window.ethereum)
+      const accounts = await web3.eth.getAccounts()
+      const account = accounts[0]
+      const kit = ContractKit.newKitFromWeb3(web3)
+      const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
+      const result = await contract.methods.mint(state.fullAddress, state.mintCount).send({
+        from: account,
+        value: web3.utils.toWei('2')
+      })
+      console.log(result)
+
+      getters.provider.once(result, async () => {
+        commit('setSuccessPurchasedNft', true)
+      })
+    } catch(e) {
+      console.log(e)
+      commit('setRejectBuyNft', true)
+    }
+  },
   async logout({commit}) {
     try {
       commit('setAddress', '')
@@ -83,5 +144,18 @@ export const mutations = {
       .concat(dotArr)
       .concat(endID)
       .join("");
+    state.fullAddress = address
   },
+  setMintCount(state, count) {
+    state.mintCount = count
+  },
+  setRejectBuyNft(state, rejectBuyNft) {
+    state.rejectBuyNft = rejectBuyNft
+  },
+  setSuccessPurchasedNft(state, successPurchasedNft) {
+    state.successPurchasedNft = successPurchasedNft
+  },
+  setNftList(state, nftList) {
+    state.nftList = nftList
+  }
 }

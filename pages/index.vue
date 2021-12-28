@@ -1,7 +1,8 @@
 <template>
   <section id="home">
     <div class="home container-xl">
-      <video src="/daopolis-movie.MP4" class="home__image" autoplay muted loop></video>
+      <!-- <video src="/daopolis-movie.MP4" class="home__image" autoplay muted loop></video> -->
+	  <video src="/daopolis-movie1.MP4" class="home__image" autoplay muted loop></video>
       <div class="home__main" v-if="currentStep === 0">
         <h1 class="home__main-name">Meet Daopolis Citizens</h1>
         <h3 class="home__main-description">Automatically generated 9192 NFT's. Born in the CyberTime era, Daopolis
@@ -43,36 +44,34 @@
         <div class="home__info-select" v-if="isConnected">
           <p class="home__info-select-title">Select the amount of NFT you want to buy</p>
           <div class="home__info-select-buttons">
-            <button class="home__info-select-buttons-button">1</button>
-            <button class="home__info-select-buttons-button">5</button>
-            <button class="home__info-select-buttons-button">10</button>
-            <button class="home__info-select-buttons-button">20</button>
+            <button class="home__info-select-buttons-button" :class="{selected: buyCount === 1}" @click="handleClickBuyCount(1)">1</button>
+            <button class="home__info-select-buttons-button" :class="{selected: buyCount === 5}" @click="handleClickBuyCount(5)">5</button>
+            <button class="home__info-select-buttons-button" :class="{selected: buyCount === 10}" @click="handleClickBuyCount(10)">10</button>
+            <button class="home__info-select-buttons-button" :class="{selected: buyCount === 20}" @click="handleClickBuyCount(20)">20</button>
           </div>
         </div>
 		<button class="home__info-connect" @click="showConnectModal = true" v-if="!isConnected">Connect Wallet</button>
-        <button class="home__info-buy" @click="showAlertPurchased = true" v-else>Buy now</button>
+        <button class="home__info-buy" @click="handleClickBuy" v-else>Buy now</button>
       </div>
     </div>
     <Footer />
-    <Loading v-if="showAlertLoad" @closeModal="closeModal" />
+    <Loading v-if="showLoadAlertModal" @closeModal="closeModal" />
 	<connect v-if="showConnectModal && !isConnected" @closeModal="closeModal"/>
-    <Error v-if="showAlertError" @closeModal="closeModal" />
-    <Purchased v-if="showAlertPurchased" @closeModal="closeModal" :openCard="false" :countCards="countCards"/>
+    <Error v-if="showErrorModal" @closeModal="closeErrorModal" />
+    <Purchased v-if="showPurchasedModal" @closeModal="closePurchasedModal" :openCard="false" :countCards="countCards"/>
   </section>
 </template>
 <script>
 import Footer from '@/components/Footer'
 import Loading from '@/components/modals/loading'
-import connect from '@/components/modals/connect'
+import Connect from '@/components/modals/connect'
 import Error from '@/components/modals/error'
 import Purchased from '@/components/modals/purchased'
 export default {
   data() {
     return {
       showAlertLoad: false,
-	  showAlertError: false,
 	  showConnectModal: false,
-      showAlertPurchased: false,
       countCards: 1,
       currentStep: 1,
       countMinted: 1650,
@@ -80,21 +79,40 @@ export default {
       widthLine: 33,
     }
   },
-  components: {
-    connect
-  },
   computed: {
 	isConnected() {
-	  return this.$store.state.address;
-	}
+	  return this.$store.state.address
+	},
+	buyCount() {
+	  return this.$store.state.mintCount
+	},
+	showErrorModal() {
+	  return this.$store.state.rejectBuyNft
+	},
+	showPurchasedModal() {
+    // return this.$store.state.successPurchasedNft
+    return true
+	},
+	showLoadAlertModal() {
+	  return this.showAlertLoad && !this.showErrorModal && !this.showPurchasedModal
+	},
   },
   methods: {
+	handleClickBuyCount(count) {
+	  this.$store.commit('setMintCount', count)
+	},
     closeModal(paylaod) {
 	  this.showConnectModal = paylaod
       this.showAlertLoad = paylaod
-      this.showAlertError = paylaod
-      this.showAlertPurchased = paylaod
-    },
+	},
+	closeErrorModal(payload) {
+	  this.$store.commit('setRejectBuyNft', payload)
+	  this.closeModal(payload)
+	},
+	closePurchasedModal(payload) {
+	  this.$store.commit('setSuccessPurchasedNft', payload)
+	  this.closeModal(payload)
+	},
     changeCountCards(sign) {
       if(sign && this.countCards < 10) {
         this.countCards += 1
@@ -102,11 +120,13 @@ export default {
         this.countCards -= 1
       }
     },
-    buyNFT() {
+    handleClickBuy() {
+	  this.showAlertLoad = true
       this.$store.dispatch('buyNft')
     },
   },
   components: {
+	Connect,
     Footer,
     Loading,
     Error,
@@ -157,7 +177,10 @@ export default {
           width: 5.7rem;
           height: 3.2rem;
           border-radius: 2rem;
-          margin-right: 3rem;
+		  margin-right: 3rem;
+		  &.selected {
+			border-color: $border3;
+		  }
         }
       }
     }
@@ -290,7 +313,7 @@ export default {
       }
       &-select-buttons {
         &-button {
-          flex: 1;
+		  flex: 1;
           &:last-child {
             margin: 0;
           }

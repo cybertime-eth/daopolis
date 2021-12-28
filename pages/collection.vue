@@ -1,54 +1,20 @@
 <template>
   <section class="collection">
     <h1 class="collection__title">My Collection</h1>
-    <div class="collection__empty" v-if="empty">
+    <div class="collection__empty" v-if="nftList.length === 0">
       <h3 class="collection__empty-title">You don't have NFT Daopolis yet</h3>
       <button class="collection__empty-button" @click="$router.push('/')">Buy</button>
     </div>
     <div class="collection__items" v-else>
-      <div class="collection__item">
-        <img src="/item-null.png" alt="item" class="collection__item-image">
+      <div class="collection__item" :key="index" v-for="(nft, index) in nftList">
+        <img :src="nft.image" alt="item" class="collection__item-image">
         <div class="collection__item-info">
           <h2 class="collection__item-info-name">
-            Daopolis #11111
+            Daopolis {{ nft.name }}
           </h2>
           <div class="collection__item-info-buttons">
             <button class="collection__item-info-buttons-transfer" @click="showTransfer = true">Transfer</button>
-            <button class="collection__item-info-buttons-open" @click="showPurchased = true">Open</button>
-          </div>
-        </div>
-      </div>
-      <div class="collection__item">
-        <img src="/item-null.png" alt="item" class="collection__item-image">
-        <div class="collection__item-info">
-          <h2 class="collection__item-info-name">
-            Daopolis #11111
-          </h2>
-          <div class="collection__item-info-buttons">
-            <button class="collection__item-info-buttons-transfer" @click="showTransfer = true">Transfer</button>
-            <button class="collection__item-info-buttons-open" @click="showPurchased = true">Open</button>
-          </div>
-        </div>
-      </div>
-      <div class="collection__item">
-        <img src="/item-1.png" alt="item" class="collection__item-image">
-        <div class="collection__item-info">
-          <h2 class="collection__item-info-name">
-            Daopolis #11111
-          </h2>
-          <div class="collection__item-info-buttons">
-            <button class="collection__item-info-buttons-transfer collection__item-info-buttons-transfer-open" @click="showTransfer = true">Transfer</button>
-          </div>
-        </div>
-      </div>
-      <div class="collection__item">
-        <img src="/item-1.png" alt="item" class="collection__item-image">
-        <div class="collection__item-info">
-          <h2 class="collection__item-info-name">
-            Daopolis #11111
-          </h2>
-          <div class="collection__item-info-buttons">
-            <button class="collection__item-info-buttons-transfer collection__item-info-buttons-transfer-open" @click="showTransfer = true">Transfer</button>
+            <!-- <button class="collection__item-info-buttons-open" @click="showPurchased = true">Open</button> -->
           </div>
         </div>
       </div>
@@ -63,10 +29,17 @@ import Purchased from '@/components/modals/purchased'
 export default {
   data() {
     return {
-      empty: false,
       showTransfer: false,
       showPurchased: false
     }
+  },
+  computed: {
+    nftList() {
+      return this.$store.state.nftList
+    }
+  },
+  mounted() {
+    this.$store.dispatch('getCollection')
   },
   methods: {
     closeModal(payload) {
@@ -113,6 +86,7 @@ export default {
     width: 28.2rem;
     height: 42.3rem;
     background: $modalColor;
+    margin-bottom: 2rem;
     border-radius: .4rem;
     &-image {
       width: 28.2rem;

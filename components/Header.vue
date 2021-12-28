@@ -5,16 +5,17 @@
         <img src="/logo.png" alt="logo" class="header__logo-img">
         <nuxt-link to="/" class="header__logo-link">DAOPOLIS</nuxt-link>
       </div>
-     <!-- <nuxt-link to="/collection"  v-if="address">
-       <button class="header__box">
-         My collection
-       </button>
-     </nuxt-link>
-     <div v-else></div> -->
-     <div class="header__wallet" v-if="address">
-       <h3 class="header__wallet-address">{{ address }}</h3>
-     </div>
-     <button class="header__connect" v-else @click="showConnectModal = true">Connect Wallet</button>
+	  <div class="header__buttons">
+		<nuxt-link to="/collection"  v-if="address">
+		  <button class="header__box">
+			My collection
+		  </button>
+		</nuxt-link>
+		<div class="header__wallet" v-if="address">
+		<h3 class="header__wallet-address">{{ address }}</h3>
+		</div>
+		<button class="header__connect" v-else @click="showConnectModal = true">Connect Wallet</button>
+	  </div>
     </div>
    <connect v-if="showConnectModal && !address" @closeModal="closeModal"/>
   </header>
@@ -79,6 +80,13 @@ header {
     width: 18.4rem;
     height: 4.8rem;
     cursor: pointer;
+  }
+  &__buttons {
+	display: flex;
+	align-items: center;
+  }
+  &__box {
+	margin-right: 30px;
   }
   &__wallet {
     background: $modalColor;
