@@ -12,8 +12,8 @@
       </div>
       <div class="home__info" v-else>
         <h1 class="home__info-name">Meet Daopolis Citizens</h1>
-        <h3 class="home__info-description">8,640 automatically generated NFT's for Daopolis play-to-earn game</h3>
-        <h3 class="home__info-minted">1650/8846 minted</h3>
+        <h3 class="home__info-description">Automatically generated 9192 NFT's. Born in the CyberTime era, Daopolis citizens will be the foundation of a new gaming metaverse on Celo. Find your digital avatar, gain access to a private club and participate in unique NFT games!</h3>
+        <h3 class="home__info-minted">1650/9192 minted</h3>
         <div class="home__info-count">
           <div class="home__info-count-line" :style="'width:' + widthLine + '%'"></div>
           <div class="home__info-count-prices">
@@ -39,7 +39,7 @@
             </div>
           </div>
         </div>
-        <div class="home__info-price"><img src="/celo.png" alt="celo"><h3>2 CELO</h3></div>
+        <div class="home__info-price"><img src="/celo.png" alt="celo"><h3>{{ totalCeloPrice }} CELO</h3></div>
         <div class="home__info-select" v-if="isConnected">
           <p class="home__info-select-title">Select the amount of NFT you want to buy</p>
           <div class="home__info-select-buttons">
@@ -84,6 +84,9 @@ export default {
 	},
 	buyCount() {
 	  return this.$store.state.mintCount
+	},
+	totalCeloPrice() {
+	  return 2 * this.buyCount
 	},
 	showErrorModal() {
 	  return this.$store.state.rejectBuyNft

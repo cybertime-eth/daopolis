@@ -12,10 +12,10 @@
           <h2 class="collection__item-info-name">
             Daopolis {{ nft.name }}
           </h2>
-          <div class="collection__item-info-buttons">
+          <!-- <div class="collection__item-info-buttons">
             <button class="collection__item-info-buttons-transfer" @click="showTransfer = true">Transfer</button>
-            <!-- <button class="collection__item-info-buttons-open" @click="showPurchased = true">Open</button> -->
-          </div>
+            <button class="collection__item-info-buttons-open" @click="showPurchased = true">Open</button>
+          </div> -->
         </div>
       </div>
     </div>
@@ -84,7 +84,7 @@ export default {
   }
   &__item {
     width: 28.2rem;
-    height: 42.3rem;
+    height: 36.2rem;
     background: $modalColor;
     margin-bottom: 2rem;
     border-radius: .4rem;
