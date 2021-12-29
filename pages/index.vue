@@ -31,25 +31,9 @@
 		  <div class="home__info-count" v-if="totalMintCount > 2000">
 		    <div class="home__info-count-line" :style="'width:' + widthLine + '%'"></div>
 		    <div class="home__info-count-prices">
-		  	  <div class="home__info-count-price">
+		  	  <div class="home__info-count-price" :key="index" v-for="(price, index) in celoPrices">
 		  	    <img src="/dot.png" alt="dot" class="home__info-count-price-dot">
-		  	    <h4 class="home__info-count-price-celo">7 celo</h4>
-		  	  </div>
-		  	  <div class="home__info-count-price">
-		  	    <img src="/dot.png" alt="dot" class="home__info-count-price-dot">
-		  	    <h4 class="home__info-count-price-celo">9 celo</h4>
-		  	  </div>
-		  	  <div class="home__info-count-price">
-		  	    <img src="/dot.png" alt="dot" class="home__info-count-price-dot">
-		  	    <h4 class="home__info-count-price-celo">11 celo</h4>
-		  	  </div>
-		  	  <div class="home__info-count-price">
-		  	    <img src="/dot.png" alt="dot" class="home__info-count-price-dot">
-		  	    <h4 class="home__info-count-price-celo">13 celo</h4>
-		  	  </div>
-		  	  <div class="home__info-count-price">
-		  	    <img src="/dot.png" alt="dot" class="home__info-count-price-dot">
-		  	    <h4 class="home__info-count-price-celo">15 celo</h4>
+		  	    <h4 class="home__info-count-price-celo">{{ price }} celo</h4>
 		  	  </div>
 		    </div>
 		  </div>
@@ -81,7 +65,7 @@ import Loading from '@/components/modals/loading'
 import Connect from '@/components/modals/connect'
 import Error from '@/components/modals/error'
 import Purchased from '@/components/modals/purchased'
-import { setTimeout } from 'timers';
+import { DISTRIBUTED_CELO_PRICES } from '@/constants'
 export default {
   data() {
     return {
@@ -120,6 +104,14 @@ export default {
 	buyCount() {
 	  return this.$store.state.mintCount
 	},
+	celoPriceInfo() {
+	  const distributedPrices = DISTRIBUTED_CELO_PRICES
+	  const celoPriceInfo = distributedPrices.find(item => this.totalMintCount >= item.min && this.totalMintCount <= item.max || this.totalMintCount > 9192 && item.min > 9192)
+	  return celoPriceInfo
+	},
+	celoPrices() {
+	  return this.celoPriceInfo ? this.celoPriceInfo.prices : []
+	},
 	totalCeloPrice() {
 	  return 2 * this.buyCount
 	},
@@ -133,6 +125,14 @@ export default {
 	  return this.showAlertLoad && !this.showErrorModal && !this.showPurchasedModal
 	},
   },
+  watch: {
+	totalMintCount() {
+	  if (this.celoPriceInfo) {
+		const prices = this.celoPriceInfo.prices
+	  	this.widthLine = (prices.indexOf(this.celoPriceInfo.price) + 1) * 100 / 6
+	  }
+	}
+  },
   mounted() {
 	if (this.$store.state.countdownTime > 0) {
 	//   const storedTime = localStorage.getItem('daopolis_sale_time')
@@ -142,7 +142,7 @@ export default {
 	  } else {
 		this.currSaleTime = this.$store.state.countdownTime
 	  }
-	  setInterval(this.countdownSaleTime, 1000)		
+	  setInterval(this.countdownSaleTime, 1000)
 	}
   },
   methods: {
@@ -264,7 +264,8 @@ export default {
       width: 100%;
       height: .4rem;
       background: $white;
-      margin-top: 2.5rem;
+	  margin-top: 2.5rem;
+	  margin-bottom: 2.9rem;
       position: relative;
       z-index: 0;
       &-line {

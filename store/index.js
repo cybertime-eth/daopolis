@@ -124,7 +124,7 @@ export const actions = {
       const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
       const result = await contract.methods.mint(state.fullAddress, state.mintCount).send({
         from: account,
-        value: web3.utils.toWei('2')
+        value: web3.utils.toWei((2 * state.mintCount).toString())
       })
       console.log('mint done')
 
