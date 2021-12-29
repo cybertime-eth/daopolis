@@ -33,7 +33,7 @@ export const actions = {
         const address = await signer.getAddress()
         commit('setAddress', address)
         if ($nuxt.$route.name === 'collection') {
-          dispatch('getCollection', address)
+          dispatch('getCollection')
         }
       } catch(e) {
         localStorage.removeItem('address')
@@ -87,7 +87,8 @@ export const actions = {
         const nftPromises = []
         const nftList = []
         const fetchCount = fetchMints ? state.mintCount : result.length
-        result.slice(-fetchCount).forEach(tokenId => promises.push(contract.methods.tokenURI(tokenId).call()))
+        const orderedResult = [...result].sort((a, b) => parseInt(a) - parseInt(b))
+        orderedResult.slice(-fetchCount).forEach(tokenId => promises.push(contract.methods.tokenURI(tokenId).call()))
         const uriList = await Promise.all(promises)
 
         uriList.forEach(tokenURI => nftPromises.push(this.$axios.get(tokenURI)))
