@@ -11,17 +11,19 @@
 			My collection
 		  </button>
 		</nuxt-link>
-		<div class="header__wallet" v-if="address">
+		<div class="header__wallet" @click="showProfileMenu = true" v-if="address">
 		<h3 class="header__wallet-address">{{ address }}</h3>
 		</div>
 		<button class="header__connect" v-else @click="showConnectModal = true">Connect Wallet</button>
 	  </div>
     </div>
    <connect v-if="showConnectModal && !address" @closeModal="closeModal"/>
+   <profileModal v-show="showProfileMenu" @closeModal="closeModal"/>
   </header>
 </template>
 <script>
 import connect from '@/components/modals/connect'
+import profileModal from '@/components/modals/profileModal'
 export default {
   data() {
     return {
@@ -31,7 +33,8 @@ export default {
     }
   },
   components: {
-    connect,
+	connect,
+	profileModal
   },
   computed: {
     user() {
