@@ -13,44 +13,59 @@
       <div class="home__info" v-else>
         <h1 class="home__info-name">Meet Daopolis Citizens</h1>
         <h3 class="home__info-description">Automatically generated 9192 NFT's. Born in the CyberTime era, Daopolis citizens will be the foundation of a new gaming metaverse on Celo. Find your digital avatar, gain access to a private club and participate in unique NFT games!</h3>
-        <h3 class="home__info-minted">{{ totalMintCount }}/9192 minted</h3>
-        <div class="home__info-count" v-if="totalMintCount > 2000">
-          <div class="home__info-count-line" :style="'width:' + widthLine + '%'"></div>
-          <div class="home__info-count-prices">
-            <div class="home__info-count-price">
-              <img src="/dot.png" alt="dot" class="home__info-count-price-dot">
-              <h4 class="home__info-count-price-celo">7 celo</h4>
-            </div>
-            <div class="home__info-count-price">
-              <img src="/dot.png" alt="dot" class="home__info-count-price-dot">
-              <h4 class="home__info-count-price-celo">9 celo</h4>
-            </div>
-            <div class="home__info-count-price">
-              <img src="/dot.png" alt="dot" class="home__info-count-price-dot">
-              <h4 class="home__info-count-price-celo">11 celo</h4>
-            </div>
-            <div class="home__info-count-price">
-              <img src="/dot.png" alt="dot" class="home__info-count-price-dot">
-              <h4 class="home__info-count-price-celo">13 celo</h4>
-            </div>
-            <div class="home__info-count-price">
-              <img src="/dot.png" alt="dot" class="home__info-count-price-dot">
-              <h4 class="home__info-count-price-celo">15 celo</h4>
-            </div>
-          </div>
-        </div>
-        <div class="home__info-price"><img src="/celo.png" alt="celo"><h3>{{ totalCeloPrice }} CELO</h3></div>
-        <div class="home__info-select" v-if="isConnected">
-          <p class="home__info-select-title">Select the amount of NFT you want to buy</p>
-          <div class="home__info-select-buttons">
-            <button class="home__info-select-buttons-button" :class="{selected: buyCount === 1}" @click="handleClickBuyCount(1)">1</button>
-            <button class="home__info-select-buttons-button" :class="{selected: buyCount === 5}" @click="handleClickBuyCount(5)">5</button>
-            <button class="home__info-select-buttons-button" :class="{selected: buyCount === 10}" @click="handleClickBuyCount(10)">10</button>
-            <button class="home__info-select-buttons-button" :class="{selected: buyCount === 20}" @click="handleClickBuyCount(20)">20</button>
-          </div>
-        </div>
+		<div class="home__info-sale" v-if="openSaleUser">
+		  <h3 class="home__info-sale-open">Public sale will open soon</h3>
+		  <div class="home__info-sale-countdown" v-if="currSaleTime > 0">
+			<div class="home__info-sale-countdown-sector day-sector">{{ countdownDay }}</div>
+			<span>:</span>
+			<div class="home__info-sale-countdown-sector hour-sector">{{ countdownHour }}</div>
+			<span>:</span>
+			<div class="home__info-sale-countdown-sector minute-sector">{{ countdownMinute }}</div>
+			<span>:</span>
+			<div class="home__info-sale-countdown-sector second-sector">{{ countdownSeconds }}</div>
+		  </div>
+		  <p class="home__info-sale-description">If you are on the whitelist, then connect and buy a collection at a low price.</p>
+		</div>
+		<div v-if="isConnected && !openSaleUser">
+		  <h3 class="home__info-minted">{{ totalMintCount }}/9192 minted</h3>
+		  <div class="home__info-count" v-if="totalMintCount > 2000">
+		    <div class="home__info-count-line" :style="'width:' + widthLine + '%'"></div>
+		    <div class="home__info-count-prices">
+		  	  <div class="home__info-count-price">
+		  	    <img src="/dot.png" alt="dot" class="home__info-count-price-dot">
+		  	    <h4 class="home__info-count-price-celo">7 celo</h4>
+		  	  </div>
+		  	  <div class="home__info-count-price">
+		  	    <img src="/dot.png" alt="dot" class="home__info-count-price-dot">
+		  	    <h4 class="home__info-count-price-celo">9 celo</h4>
+		  	  </div>
+		  	  <div class="home__info-count-price">
+		  	    <img src="/dot.png" alt="dot" class="home__info-count-price-dot">
+		  	    <h4 class="home__info-count-price-celo">11 celo</h4>
+		  	  </div>
+		  	  <div class="home__info-count-price">
+		  	    <img src="/dot.png" alt="dot" class="home__info-count-price-dot">
+		  	    <h4 class="home__info-count-price-celo">13 celo</h4>
+		  	  </div>
+		  	  <div class="home__info-count-price">
+		  	    <img src="/dot.png" alt="dot" class="home__info-count-price-dot">
+		  	    <h4 class="home__info-count-price-celo">15 celo</h4>
+		  	  </div>
+		    </div>
+		  </div>
+		  <div class="home__info-price"><img src="/celo.png" alt="celo"><h3>{{ totalCeloPrice }} CELO</h3></div>
+		  <div class="home__info-select">
+		    <p class="home__info-select-title">Select the amount of NFT you want to buy</p>
+		    <div class="home__info-select-buttons">
+		  	  <button class="home__info-select-buttons-button" :class="{selected: buyCount === 1}" @click="handleClickBuyCount(1)">1</button>
+		  	  <button class="home__info-select-buttons-button" :class="{selected: buyCount === 5}" @click="handleClickBuyCount(5)">5</button>
+		  	  <button class="home__info-select-buttons-button" :class="{selected: buyCount === 10}" @click="handleClickBuyCount(10)">10</button>
+		  	  <button class="home__info-select-buttons-button" :class="{selected: buyCount === 20}" @click="handleClickBuyCount(20)">20</button>
+		    </div>
+		  </div>
+		</div>
 		<button class="home__info-connect" @click="showConnectModal = true" v-if="!isConnected">Connect Wallet</button>
-        <button class="home__info-buy" @click="handleClickBuy" v-else>Buy now</button>
+        <button class="home__info-buy" @click="handleClickBuy" v-else-if="!openSaleUser">Buy now</button>
       </div>
     </div>
     <Footer />
@@ -66,6 +81,7 @@ import Loading from '@/components/modals/loading'
 import Connect from '@/components/modals/connect'
 import Error from '@/components/modals/error'
 import Purchased from '@/components/modals/purchased'
+import { setTimeout } from 'timers';
 export default {
   data() {
     return {
@@ -75,12 +91,28 @@ export default {
       currentStep: 1,
       countMinted: 1650,
       maxCountMinted: 8846,
-      widthLine: 33,
+	  widthLine: 33,
+	  currSaleTime: 0
     }
   },
   computed: {
 	isConnected() {
 	  return this.$store.state.address
+	},
+	openSaleUser() {
+	  return !this.$store.state.userInWhitelist
+	},
+	countdownDay() {
+	  return this.getFormattedTime(this.currSaleTime / 3600 / 24)
+	},
+	countdownHour() {
+	  return this.getFormattedTime(this.currSaleTime % (3600 * 24) / 3600)
+	},
+	countdownMinute() {
+	  return this.getFormattedTime(this.currSaleTime % (3600 * 24) % 3600 / 60)
+	},
+	countdownSeconds() {
+	  return this.getFormattedTime(this.currSaleTime % (3600 * 24) % 3600 % 60)
 	},
 	totalMintCount() {
 	  return this.$store.state.totalMintCount
@@ -101,6 +133,18 @@ export default {
 	  return this.showAlertLoad && !this.showErrorModal && !this.showPurchasedModal
 	},
   },
+  mounted() {
+	if (this.$store.state.countdownTime > 0) {
+	//   const storedTime = localStorage.getItem('daopolis_sale_time')
+	  const storedTime = null
+	  if (storedTime) {
+		this.currSaleTime = parseInt(storedTime)
+	  } else {
+		this.currSaleTime = this.$store.state.countdownTime
+	  }
+	  setInterval(this.countdownSaleTime, 1000)		
+	}
+  },
   methods: {
 	handleClickBuyCount(count) {
 	  this.$store.commit('setMintCount', count)
@@ -117,13 +161,14 @@ export default {
 	  this.$store.commit('setSuccessPurchasedNft', payload)
 	  this.closeModal(payload)
 	},
-    changeCountCards(sign) {
-      if(sign && this.countCards < 10) {
-        this.countCards += 1
-      } else if(!sign && this.countCards >= 2){
-        this.countCards -= 1
-      }
-    },
+	getFormattedTime(time) {
+	  const decimalTime = Math.floor(time)
+	  return decimalTime > 9 ? Math.floor(decimalTime) : `0${decimalTime}`
+	},
+    countdownSaleTime() {
+	  this.currSaleTime = this.currSaleTime - 1
+	  localStorage.setItem('daopolis_sale_time', this.currSaleTime)
+	},
     handleClickBuy() {
 	  this.showAlertLoad = true
       this.$store.dispatch('buyNft')
@@ -159,7 +204,7 @@ export default {
       letter-spacing: 0.1em;
       text-transform: uppercase;
     }
-    &-minted {
+    &-minted, &-sale-open {
       color: $green;
       text-transform: uppercase;
       font-family: OpenSans-Bold;
@@ -167,6 +212,33 @@ export default {
       text-align: center;
       font-size: 1.8rem;
     }
+	&-sale {
+	  &-open {
+		text-transform: none;
+		text-align: left;
+		font-size: 1.35rem;
+	  }
+	  &-countdown {
+		display: flex;
+		align-items: center;
+		margin-top: 1.8rem;
+		font-family: OpenSans-Bold;
+		font-weight: 500;
+		font-size: 2.25rem;
+		&-sector {
+		  background: $gray2;
+		  padding: 5px 8px;
+		  border-radius: 2px;
+		  color: $textColor;
+		}
+		span {
+		  padding: 0 5px;
+		}
+	  }
+	  &-description {
+		padding-top: 2.4rem;
+	  }
+	}
     &-description {
       font-size: 1.8rem;
       padding-top: 1rem;

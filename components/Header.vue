@@ -6,7 +6,7 @@
         <nuxt-link to="/" class="header__logo-link">DAOPOLIS</nuxt-link>
       </div>
 	  <div class="header__buttons">
-		<nuxt-link to="/collection"  v-if="address">
+		<nuxt-link to="/collection"  v-if="address && !openSaleUser">
 		  <button class="header__box">
 			My collection
 		  </button>
@@ -37,8 +37,8 @@ export default {
 	profileModal
   },
   computed: {
-    user() {
-      return this.$store.state.user
+    openSaleUser() {
+      return !this.$store.state.userInWhitelist
     },
     address() {
       return this.$store.state.address

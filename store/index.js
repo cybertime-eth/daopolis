@@ -3,11 +3,14 @@ import { ethers, Wallet, providers } from 'ethers'
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import daosABI from '../abi/daos.json'
 import { newKit } from "@celo/contractkit";
+import { WHITELIST_ADDRESSES } from '@/constants'
 const ContractKit = require('@celo/contractkit')
 export const state = () => ({
   daosContract: '0x34d63dc2f8c5655bA6E05124B3D4a283A402CEd9',
+  countdownTime: 604800, // 7 * 24 * 3600(7 days - countdown time as seconds)
   fullAddress: null,
   address: null,
+  userInWhitelist: false,
   mintCount: 5,
   totalMintCount: 0,
   rejectBuyNft: false,
@@ -46,7 +49,6 @@ export const actions = {
     const kit = ContractKit.newKitFromWeb3(web3)
     const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
     const totalSupply = await contract.methods.totalSupply().call()
-    console.log('0000', totalSupply)
     commit('setTotalMintCount', totalSupply)
   },
   async connectMetaTrust({getters, commit}) {
@@ -157,6 +159,9 @@ export const mutations = {
       .concat(endID)
       .join("");
     state.fullAddress = address
+    if (WHITELIST_ADDRESSES.includes(address)) {
+      state.userInWhitelist = true
+    }
   },
   setTotalMintCount(state, totalCount) {
     state.totalMintCount = totalCount
