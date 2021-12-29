@@ -12,6 +12,7 @@ export default {
   },
  async mounted() {
     await this.$store.dispatch('updateUser')
+    await this.$store.dispatch('updateTotalMintCount')
     await this.$store.dispatch('walletConnect', false)
   }
 }

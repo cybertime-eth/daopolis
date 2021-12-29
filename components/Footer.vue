@@ -5,35 +5,35 @@
         <img src="/cybertime.png" alt="cybertime" class="footer__links-logo">
         <ul class="footer__links-ul">
           <li class="footer__links-list">
-            <a href="#" class="footer__links-link">Medium</a>
+            <a href="https://cybertime.medium.com/" class="footer__links-link">Medium</a>
           </li>
           <li class="footer__links-list">
-            <a href="#" class="footer__links-link">Twitter</a>
+            <a href="https://twitter.com/cybertime_eth" class="footer__links-link">Twitter</a>
           </li>
           <li class="footer__links-list">
-            <a href="#" class="footer__links-link">Telegram</a>
+            <a href="https://t.me/cybertime_eth" class="footer__links-link">Telegram</a>
           </li>
           <li class="footer__links-list">
-            <a href="#" class="footer__links-link">Github</a>
+            <a href="https://github.com/cybertime-eth" class="footer__links-link">Github</a>
+          </li>
+          <li class="footer__links-list">
+            <a href="https://discord.gg/cKcWfCux4s" class="footer__links-link">Discord</a>
           </li>
         </ul>
       </div>
-      <div class="footer__links">
+      <!-- <div class="footer__links">
         <ul class="footer__links-ul">
           <li class="footer__links-list">
-            <a href="#" class="footer__links-link">Team</a>
+            <a href="https://cyberbox.art" class="footer__links-link">CyberBox NFT Marketplace</a>
           </li>
           <li class="footer__links-list">
-            <a href="#" class="footer__links-link">Litepaper</a>
+            <a href="https://docs.cybertime.finance/team" class="footer__links-link">Team</a>
           </li>
           <li class="footer__links-list">
-            <a href="#" class="footer__links-link">Smart contract</a>
-          </li>
-          <li class="footer__links-list">
-            <a href="#" class="footer__links-link">Security Audit</a>
+            <a href="https://docs.cybertime.finance/litepaper" class="footer__links-link">Litepaper</a>
           </li>
         </ul>
-      </div>
+      </div> -->
     </div>
   </footer>
 </template>
@@ -46,7 +46,7 @@ footer {
 .footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   height: 100%;
   &__links {
     display: flex;

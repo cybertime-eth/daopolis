@@ -9,6 +9,7 @@ export const state = () => ({
   fullAddress: null,
   address: null,
   mintCount: 5,
+  totalMintCount: 0,
   rejectBuyNft: false,
   successPurchasedNft: false,
   nftList: []
@@ -39,6 +40,14 @@ export const actions = {
         localStorage.removeItem('address')
       }
     }
+  },
+  async updateTotalMintCount({commit, state}) {
+    const web3 = new Web3(window.ethereum)
+    const kit = ContractKit.newKitFromWeb3(web3)
+    const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
+    const totalSupply = await contract.methods.totalSupply().call()
+    console.log('0000', totalSupply)
+    commit('setTotalMintCount', totalSupply)
   },
   async connectMetaTrust({getters, commit}) {
     try {
@@ -148,6 +157,9 @@ export const mutations = {
       .concat(endID)
       .join("");
     state.fullAddress = address
+  },
+  setTotalMintCount(state, totalCount) {
+    state.totalMintCount = totalCount
   },
   setMintCount(state, count) {
     state.mintCount = count

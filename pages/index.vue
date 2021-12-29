@@ -13,8 +13,8 @@
       <div class="home__info" v-else>
         <h1 class="home__info-name">Meet Daopolis Citizens</h1>
         <h3 class="home__info-description">Automatically generated 9192 NFT's. Born in the CyberTime era, Daopolis citizens will be the foundation of a new gaming metaverse on Celo. Find your digital avatar, gain access to a private club and participate in unique NFT games!</h3>
-        <h3 class="home__info-minted">1650/9192 minted</h3>
-        <div class="home__info-count">
+        <h3 class="home__info-minted">{{ totalMintCount }}/9192 minted</h3>
+        <div class="home__info-count" v-if="totalMintCount > 2000">
           <div class="home__info-count-line" :style="'width:' + widthLine + '%'"></div>
           <div class="home__info-count-prices">
             <div class="home__info-count-price">
@@ -81,6 +81,9 @@ export default {
   computed: {
 	isConnected() {
 	  return this.$store.state.address
+	},
+	totalMintCount() {
+	  return this.$store.state.totalMintCount
 	},
 	buyCount() {
 	  return this.$store.state.mintCount
@@ -160,7 +163,7 @@ export default {
       color: $green;
       text-transform: uppercase;
       font-family: OpenSans-Bold;
-      padding-top: 6rem;
+      padding-top: 4.8rem;
       text-align: center;
       font-size: 1.8rem;
     }
@@ -228,7 +231,7 @@ export default {
     &-price {
       display: flex;
       align-items: center;
-      padding-top: 6rem;
+      padding-top: 2.8rem;
       img {
         width: 2rem;
         margin-right: 1rem;
