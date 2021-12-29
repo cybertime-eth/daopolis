@@ -12,6 +12,7 @@ export const state = () => ({
   address: null,
   userInWhitelist: false,
   mintCount: 5,
+  celoPrice: 2,
   totalMintCount: 0,
   rejectBuyNft: false,
   successPurchasedNft: false,
@@ -124,7 +125,7 @@ export const actions = {
       const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
       const result = await contract.methods.mint(state.fullAddress, state.mintCount).send({
         from: account,
-        value: web3.utils.toWei((2 * state.mintCount).toString())
+        value: web3.utils.toWei((state.celoPrice * state.mintCount).toString())
       })
       console.log('mint done')
 
@@ -168,6 +169,9 @@ export const mutations = {
   },
   setMintCount(state, count) {
     state.mintCount = count
+  },
+  setCeloPrice(state, price) {
+    state.celoPrice = price
   },
   setRejectBuyNft(state, rejectBuyNft) {
     state.rejectBuyNft = rejectBuyNft

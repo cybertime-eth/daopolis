@@ -110,10 +110,10 @@ export default {
 	  return celoPriceInfo
 	},
 	celoPrices() {
-	  return this.celoPriceInfo ? this.celoPriceInfo.prices : []
+	  return DISTRIBUTED_CELO_PRICES.map(item => item.price)
 	},
 	totalCeloPrice() {
-	  return 2 * this.buyCount
+	  return this.$store.state.celoPrice * this.buyCount
 	},
 	showErrorModal() {
 	  return this.$store.state.rejectBuyNft
@@ -128,8 +128,9 @@ export default {
   watch: {
 	totalMintCount() {
 	  if (this.celoPriceInfo) {
-		const prices = this.celoPriceInfo.prices
-	  	this.widthLine = (prices.indexOf(this.celoPriceInfo.price) + 1) * 100 / 6
+		const prices = this.celoPrices
+		this.widthLine = (prices.indexOf(this.celoPriceInfo.price) + 1) * 100 / ( prices.length + 1)
+		this.$store.commit('setCeloPrice', this.celoPriceInfo.price)
 	  }
 	}
   },
@@ -279,12 +280,13 @@ export default {
       &-prices {
         display: flex;
         align-items: center;
-        width: 44rem;
+        width: 48rem;
         justify-content: space-between;
         margin: 0 auto;
         position: absolute;
         top: -.2rem;
-        left: 7.3rem;
+		left: 50%;
+		transform: translateX(-50%)
       }
       &-price {
         display: flex;
