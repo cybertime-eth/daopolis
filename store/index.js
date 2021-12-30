@@ -19,6 +19,12 @@ export const state = () => ({
   nftList: []
 })
 
+const isMobile = () => {
+  const isMobile = /iphone|ipod|android|blackberry|opera|mini|windows\sce|palm|smartphone|iemobile/i.test(navigator.userAgent.toLowerCase()) && navigator.userAgent.search('PC') === -1
+  const isTablet = /ipad|nexus 7|nexus 9|android 3.0|kindle|silk|kftt|kfot|kfjwa|kfjwi|kfsowi|kfthwa|kfthwi|kfapwa|kfapwi/i.test(navigator.userAgent.toLowerCase()) && navigator.userAgent.search('PC') === -1
+  return isMobile || isTablet
+}
+
 export const getters = {
   provider() {
     const web3 = window.web3.eth && window.web3.eth.currentProvider.connected ? window.web3.eth : window.ethereum
@@ -49,10 +55,15 @@ export const actions = {
     const web3 = new Web3(window.ethereum)
     const kit = ContractKit.newKitFromWeb3(web3)
     const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
-    const totalSupply = await contract.methods.totalSupply().call()
+    const totalSupply = await contract.methods.dev().call()
     commit('setTotalMintCount', totalSupply)
   },
   async connectMetaTrust({getters, commit}) {
+    if (isMobile()) {
+      alert(window.ethereum)
+      alert(window.web3)
+    }
+
     try {
       if (window.ethereum) {
         await window.ethereum.request({ method: 'eth_requestAccounts' })
@@ -123,9 +134,10 @@ export const actions = {
       const account = accounts[0]
       const kit = ContractKit.newKitFromWeb3(web3)
       const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
+      const msgValue = state.totalMintCount < 2000 ? 0 : web3.utils.toWei((state.celoPrice * state.mintCount).toString())
       const result = await contract.methods.mint(state.fullAddress, state.mintCount).send({
         from: account,
-        value: web3.utils.toWei((state.celoPrice * state.mintCount).toString())
+        value: msgValue
       })
       console.log('mint done')
 
