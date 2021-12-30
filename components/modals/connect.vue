@@ -1,10 +1,10 @@
 <template>
   <div class="modal">
-    <div class="modal__block">
-      <h2 class="modal__title desktop">Connect your wallet</h2>
-			<h2 class="modal__title mobile">Open <span class="modal__title-city">daopolis.city</span> in your Metamask mobile app</h2>
+    <div class="modal__block" :class="{'no-metamask': !metamaskEnabled}">
+      <h2 class="modal__title" :class="{desktop: metamaskEnabled}">Connect your wallet</h2>
+			<h2 class="modal__title mobile" v-if="!metamaskEnabled">Open <span class="modal__title-city">daopolis.city</span> in your Metamask mobile app</h2>
       <img src="/close.svg" alt="close" class="modal__close" @click="closeModal">
-      <div class="modal__connect desktop">
+      <div class="modal__connect" :class="{ desktop: !metamaskEnabled }">
         <button class="modal__connect-button" @click="connectMetaTrust">
           MetaMask
           <img src="/auth/metamask.svg" alt="metamask" class="modal__connect-button-image">
@@ -18,12 +18,20 @@
           <img src="/auth/WalletConnect.png" alt="metamask" class="modal__connect-button-image">
         </button> -->
       </div>
-			<img src="/auth/metamask-mobile.svg" alt="metamask" class="modal__connect-image mobile">
+			<img src="/auth/metamask-mobile.svg" alt="metamask" class="modal__connect-image mobile" v-if="!metamaskEnabled">
     </div>
   </div>
 </template>
 <script>
 export default {
+	data() {
+		return {
+			metamaskEnabled: false
+		}
+	},
+	mounted() {
+		this.metamaskEnabled = !!window.ethereum
+	},
   methods: {
     async connectMetaTrust() {
       await this.$store.dispatch('connectMetaTrust')
@@ -57,9 +65,13 @@ export default {
     }
 	}
 	@media(max-width: 460px) {
+		margin-left: 0.3rem;
 		&__block {
-			padding-top: 8rem !important;
-			padding-bottom: 4rem !important;
+			width: 100%;
+			&.no-metamask {
+				padding-top: 8rem !important;
+				padding-bottom: 4rem !important;
+			}
 		}
 		&__title {
 			width: 70%;
@@ -70,6 +82,9 @@ export default {
 			&-city {
 				color: $green;
 			}
+		}
+		&__connect-button {
+			width: 100%;
 		}
 		&__connect-image {
 			margin-top: 4rem !important;

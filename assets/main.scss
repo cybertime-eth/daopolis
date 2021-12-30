@@ -19,10 +19,8 @@
     display: inherit;
   }
   .modal {
-    left: .8rem;
-    right: .8rem;
     &__block {
-      width: 100%;
+      margin: 0 0.8rem;
       padding-left: 2.1rem;
       padding-right: 2.1rem;
       font-size: 1.6rem;
