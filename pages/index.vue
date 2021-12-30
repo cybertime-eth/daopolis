@@ -28,7 +28,7 @@
 		</div>
 		<div v-if="isConnected && !openSaleUser">
 		  <h3 class="home__info-minted">{{ totalMintCount }}/9192 minted</h3>
-		  <div class="home__info-count" v-if="totalMintCount > 2000">
+		  <div class="home__info-count" v-if="totalMintCount >= 2000">
 		    <div class="home__info-count-line" :style="'width:' + widthLine + '%'"></div>
 		    <div class="home__info-count-prices">
 		  	  <div class="home__info-count-price" :key="index" v-for="(price, index) in celoPrices">
@@ -37,7 +37,7 @@
 		  	  </div>
 		    </div>
 		  </div>
-		  <div class="home__info-price" v-if="totalMintCount > 2000"><img src="/celo.png" alt="celo"><h3>{{ totalCeloPrice }} CELO</h3></div>
+		  <div class="home__info-price" v-if="totalMintCount >= 2000"><img src="/celo.png" alt="celo"><h3>{{ totalCeloPrice }} CELO</h3></div>
 		  <div class="home__info-select">
 		    <p class="home__info-select-title">Select the amount of NFT you want to buy</p>
 		    <div class="home__info-select-buttons">
@@ -106,7 +106,7 @@ export default {
 	},
 	celoPriceInfo() {
 	  const distributedPrices = DISTRIBUTED_CELO_PRICES
-	  const celoPriceInfo = distributedPrices.find(item => this.totalMintCount >= item.min && this.totalMintCount <= item.max || this.totalMintCount > 9192 && item.min > 9192)
+	  const celoPriceInfo = distributedPrices.find(item => this.totalMintCount >= item.min && this.totalMintCount < item.max || this.totalMintCount > 9192 && item.min > 9192)
 	  return celoPriceInfo
 	},
 	celoPrices() {
