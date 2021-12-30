@@ -38,6 +38,9 @@ export const getters = {
 
 export const actions = {
   async updateUser({getters, commit, dispatch}) {
+    if (isMobile()) {
+      localStorage.removeItem('address')
+    }
     if (localStorage.getItem('address') && !localStorage.getItem('walletconnect')) {
       try {
         const signer = await getters.provider.getSigner()
