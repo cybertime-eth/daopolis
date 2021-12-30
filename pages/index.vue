@@ -84,7 +84,7 @@ export default {
 	  return this.$store.state.address
 	},
 	openSaleUser() {
-	  return !this.$store.state.userInWhitelist
+	  return !this.$store.state.userInWhitelist && this.currSaleTime >= 0
 	},
 	countdownDay() {
 	  return this.getFormattedTime(this.currSaleTime / 3600 / 24)
