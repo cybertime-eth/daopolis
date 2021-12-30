@@ -37,7 +37,7 @@
 		  	  </div>
 		    </div>
 		  </div>
-		  <div class="home__info-price"><img src="/celo.png" alt="celo"><h3>{{ totalCeloPrice }} CELO</h3></div>
+		  <div class="home__info-price" v-if="totalMintCount > 2000"><img src="/celo.png" alt="celo"><h3>{{ totalCeloPrice }} CELO</h3></div>
 		  <div class="home__info-select">
 		    <p class="home__info-select-title">Select the amount of NFT you want to buy</p>
 		    <div class="home__info-select-buttons">
