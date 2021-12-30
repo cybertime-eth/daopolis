@@ -14,7 +14,7 @@
         <h1 class="home__info-name">Meet Daopolis Citizens</h1>
         <h3 class="home__info-description">Automatically generated 9192 NFT's. Born in the CyberTime era, Daopolis citizens will be the foundation of a new gaming metaverse on Celo. Find your digital avatar, gain access to a private club and participate in unique NFT games!</h3>
 		<div class="home__info-sale" v-if="openSaleUser">
-		  <h3 class="home__info-sale-open">Public sale will open soon</h3>
+		  <h3 class="home__info-sale-open" v-if="currSaleTime >= 0">Public sale will open soon</h3>
 		  <div class="home__info-sale-countdown" v-if="currSaleTime > 0">
 			<div class="home__info-sale-countdown-sector day-sector">{{ countdownDay }}</div>
 			<span>:</span>
@@ -65,7 +65,7 @@ import Loading from '@/components/modals/loading'
 import Connect from '@/components/modals/connect'
 import Error from '@/components/modals/error'
 import Purchased from '@/components/modals/purchased'
-import { DISTRIBUTED_CELO_PRICES } from '@/constants'
+import { DISTRIBUTED_CELO_PRICES, SALE_START_TIME, SALE_TIMEZONE_UTC, OPEN_SALE_HOURS } from '@/constants'
 export default {
   data() {
     return {
@@ -135,15 +135,20 @@ export default {
 	}
   },
   mounted() {
-	if (this.$store.state.countdownTime > 0) {
-	//   const storedTime = localStorage.getItem('daopolis_sale_time')
-	  const storedTime = null
-	  if (storedTime) {
-		this.currSaleTime = parseInt(storedTime)
-	  } else {
-		this.currSaleTime = this.$store.state.countdownTime
+	const startSaleTime = SALE_START_TIME
+	if (startSaleTime > 0) {
+	  const currLocalDate = new Date()
+	  const startUTCTime = startSaleTime + (-SALE_TIMEZONE_UTC * 60 * 60000)
+	  const startLocalDate = new Date(startUTCTime + 3600000 * SALE_TIMEZONE_UTC)
+	  const endLocalDate = new Date(startLocalDate.getTime() + (12 * 60 * 60 * 1000))
+	  const diffSeconds = (endLocalDate - currLocalDate) / 1000
+	  const saleSeconds = OPEN_SALE_HOURS * 3600
+	  if (diffSeconds <= saleSeconds) {
+		this.currSaleTime = diffSeconds
+		setInterval(this.countdownSaleTime, 1000)
+	  } else if (diffSeconds < 0) {
+		this.currSaleTime = -1
 	  }
-	  setInterval(this.countdownSaleTime, 1000)
 	}
   },
   methods: {
@@ -168,7 +173,6 @@ export default {
 	},
     countdownSaleTime() {
 	  this.currSaleTime = this.currSaleTime - 1
-	  localStorage.setItem('daopolis_sale_time', this.currSaleTime)
 	},
     handleClickBuy() {
 	  this.showAlertLoad = true

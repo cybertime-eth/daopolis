@@ -6,7 +6,6 @@ import { WHITELIST_ADDRESSES } from '@/constants'
 const ContractKit = require('@celo/contractkit')
 export const state = () => ({
   daosContract: '0x34d63dc2f8c5655bA6E05124B3D4a283A402CEd9',
-  countdownTime: 604800, // 7 * 24 * 3600(7 days - countdown time as seconds)
   fullAddress: null,
   address: null,
   userInWhitelist: false,
