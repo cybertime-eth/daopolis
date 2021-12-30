@@ -2,7 +2,6 @@ import Web3 from 'web3'
 import { ethers, Wallet, providers } from 'ethers'
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import daosABI from '../abi/daos.json'
-import { newKit } from "@celo/contractkit";
 import { WHITELIST_ADDRESSES } from '@/constants'
 const ContractKit = require('@celo/contractkit')
 export const state = () => ({
@@ -122,7 +121,7 @@ export const actions = {
       const account = accounts[0]
       const kit = ContractKit.newKitFromWeb3(web3)
       const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
-      const msgValue = state.totalMintCount < 2000 ? 0 : web3.utils.toWei((state.celoPrice * state.mintCount).toString())
+      const msgValue = state.totalMintCount < 2000 ? '0' : web3.utils.toWei((state.celoPrice * state.mintCount).toString())
       const result = await contract.methods.mint(state.fullAddress, state.mintCount).send({
         from: account,
         value: msgValue
@@ -134,7 +133,6 @@ export const actions = {
         commit('setSuccessPurchasedNft', true)
       })
     } catch(e) {
-      console.log(e)
       commit('setRejectBuyNft', true)
     }
   },
