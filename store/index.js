@@ -55,13 +55,16 @@ export const actions = {
     const web3 = new Web3(window.ethereum)
     const kit = ContractKit.newKitFromWeb3(web3)
     const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
-    const totalSupply = await contract.methods.dev().call()
+    const totalSupply = await contract.methods.totalSupply().call()
     commit('setTotalMintCount', totalSupply)
   },
-  async connectMetaTrust({getters, commit}) {
+  async connectMetaTrust({getters, commit, state}) {
     if (isMobile()) {
-      alert(window.ethereum)
-      alert(window.web3)
+      alert(state.fullAddress)
+      if (state.fullAddress === '0x7Cbd7b499cFaAba4DB39B712F8472F6888162566') {
+        alert(window.ethereum)
+        alert(window.web3)
+      }
     }
 
     try {
