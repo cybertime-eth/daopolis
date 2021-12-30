@@ -30,7 +30,7 @@ export const DISTRIBUTED_CELO_PRICES = [{
   price: 50
 }]
 
-export const SALE_START_TIME = 1640888700000 // 2021-12-30:21:25:00 (Moscow Standard Time)
+export const SALE_START_TIME = 1640894400000 // 2021-12-30:23:00:00 (Moscow Standard Time)
 
 export const SALE_TIMEZONE_UTC = 3
 
