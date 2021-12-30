@@ -27,7 +27,7 @@ const isMobile = () => {
 
 export const getters = {
   provider() {
-    const web3 = window.web3.eth && window.web3.eth.currentProvider.connected ? window.web3.eth : window.ethereum
+    const web3 = window.web3 && window.web3.eth && window.web3.eth.currentProvider.connected ? window.web3.eth : window.ethereum
     if (web3) {
       return new ethers.providers.Web3Provider(web3);
     } else {
@@ -51,35 +51,40 @@ export const actions = {
       }
     }
   },
-  async updateTotalMintCount({commit, state}) {
-    const web3 = new Web3(window.ethereum)
+  async updateTotalMintCount({commit, state, getters}) {
+    const web3 = new Web3(getters.provider)
     const kit = ContractKit.newKitFromWeb3(web3)
     const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
     const totalSupply = await contract.methods.totalSupply().call()
     commit('setTotalMintCount', totalSupply)
   },
   async connectMetaTrust({getters, commit, state}) {
-    if (isMobile()) {
-      alert(state.fullAddress)
-      if (state.fullAddress === '0x7Cbd7b499cFaAba4DB39B712F8472F6888162566') {
+    try {
+      if (isMobile()) {
         alert(window.ethereum)
         alert(window.web3)
       }
-    }
-
-    try {
       if (window.ethereum) {
         await window.ethereum.request({ method: 'eth_requestAccounts' })
         const address = await getters.provider.getSigner().getAddress();
         commit('setAddress', address)
-      } else if (window.web3) {
+      }/* else if (window.web3) {
         window.web3 = new ethers.providers.Web3Provider(
           window.web3.currentProvider
         );
         const address = await getters.provider.getSigner().getAddress();
         commit('setAddress', address)
-      } else {
-        alert("please use web3 enabled browser.");
+      } */else {
+        // alert("please use web3 enabled browser.");
+        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        if (/android/i.test(userAgent)) {
+          const appLink = 'https://metamask.app.link/dapp/' + window.location.host
+          window.location.replace(appLink)
+        }
+        else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+          const appLink = 'metamask://'
+          window.location.href = appLink
+        }
       }
     } catch (error) {
       throw new Error(error);
