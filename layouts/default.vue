@@ -96,6 +96,11 @@ ul {
 .container-xl {
   width: 120rem;
   margin: 0 auto;
+
+  @media(max-width: 460px) {
+    width: 94%;
+    margin: 0 auto;
+  }
 }
 .container-l {
   width: 81.8rem;

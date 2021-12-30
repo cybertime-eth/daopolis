@@ -24,7 +24,7 @@
 			<span>:</span>
 			<div class="home__info-sale-countdown-sector second-sector">{{ countdownSeconds }}</div>
 		  </div>
-		  <p class="home__info-sale-description">If you are on the whitelist, then connect and buy a collection at a low price.</p>
+		  <p class="home__info-sale-description" v-if="!isConnected">If you are on the whitelist, then connect and buy a collection at a low price.</p>
 		</div>
 		<div v-if="isConnected && !openSaleUser">
 		  <h3 class="home__info-minted">{{ totalMintCount }}/9192 minted</h3>
@@ -378,7 +378,7 @@ export default {
     }
     &__info {
       padding-top: 3.6rem;
-      &-name, &-description, &-minted {
+      &-name, &-description, &-minted, &-sale-open, &-sale-description {
         text-align: center;
       }
       &-minted {
@@ -398,6 +398,12 @@ export default {
           }
         }
       }
+      &-sale-countdown {
+        justify-content: center;
+	  }
+	  &-count-prices {
+		width: 29rem;
+	  }
     }
   }
 }

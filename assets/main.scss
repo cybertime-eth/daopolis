@@ -1,3 +1,31 @@
 .VueCarousel {
   width: 23rem;
 }
+.desktop {
+  display: inherit;
+}
+.desktop-inline {
+  display: inline-block;
+}
+.mobile {
+  display: none
+}
+
+@media(max-width: 460px) {
+  .desktop, .desktop-inline {
+    display: none;
+  }
+  .mobile {
+    display: inherit;
+  }
+  .modal {
+    left: .8rem;
+    right: .8rem;
+    &__block {
+      width: 100%;
+      padding-left: 2.1rem;
+      padding-right: 2.1rem;
+      font-size: 1.6rem;
+    }
+  }
+}

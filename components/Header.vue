@@ -1,40 +1,49 @@
 <template>
   <header>
     <div class="header container-xl">
+    <nuxt-link to="/">
       <div class="header__logo">
-        <img src="/logo.png" alt="logo" class="header__logo-img">
-        <nuxt-link to="/" class="header__logo-link">DAOPOLIS</nuxt-link>
+        <img :src="logoImage" alt="logo" class="header__logo-img">
+        <span class="header__logo-link">DAOPOLIS</span>
       </div>
+    </nuxt-link>
 	  <div class="header__buttons">
 		<nuxt-link to="/collection"  v-if="address && !openSaleUser">
 		  <button class="header__box">
 			My collection
 		  </button>
 		</nuxt-link>
-		<div class="header__wallet" @click="showProfileMenu = true" v-if="address">
+		<div class="header__wallet" @click="handleShowProfileMenu" v-if="address">
 		<h3 class="header__wallet-address">{{ address }}</h3>
 		</div>
-		<button class="header__connect" v-else @click="showConnectModal = true">Connect Wallet</button>
+		<button class="header__connect" v-else @click="showConnectModal = true">Connect <span class="desktop-inline">Wallet</span></button>
+    <img src="/burger.svg" alt="burger" class="header__mobile-menu" @click="openProfileMenu" v-if="!showProfileMenuMobile">
+    <img src="/close.svg" alt="burger" class="header__mobile-menu" @click="closeProfileMenu" v-else>
 	  </div>
     </div>
    <connect v-if="showConnectModal && !address" @closeModal="closeModal"/>
    <profileModal v-show="showProfileMenu" @closeModal="closeModal"/>
+   <profileMenuMobile v-show="showProfileMenuMobile"/>
   </header>
 </template>
 <script>
 import connect from '@/components/modals/connect'
 import profileModal from '@/components/modals/profileModal'
+import profileMenuMobile from '@/components/modals/profileMenuMobile'
 export default {
   data() {
     return {
       image: false,
       showConnectModal: false,
-      showProfileMenu: false
+      showProfileMenu: false,
+      showProfileMenuMobile: false,
+      isMobilePlatform: false
     }
   },
   components: {
 	connect,
-	profileModal
+	profileModal,
+	profileMenuMobile
   },
   computed: {
     openSaleUser() {
@@ -42,13 +51,36 @@ export default {
     },
     address() {
       return this.$store.state.address
+    },
+    logoImage() {
+      if (!this.isMobilePlatform) {
+        return '/logo.png';
+      } else {
+        return '/logo-mobile.png';
+      }
     }
   },
+  mounted() {
+    this.isMobilePlatform = this.isMobile()
+  },
   methods: {
+    handleShowProfileMenu() {
+      if (!this.isMobilePlatform) {
+        this.showProfileMenu = true
+      }
+    },
     closeModal(payload) {
       this.showConnectModal = payload
       this.showProfileMenu = payload
-    }
+	},
+	openProfileMenu() {
+	  document.querySelector('.header').classList.add('fixed')
+	  this.showProfileMenuMobile = true
+	},
+	closeProfileMenu() {
+	  document.querySelector('.header').classList.remove('fixed')
+	  this.showProfileMenuMobile = false
+	}
   }
 }
 </script>
@@ -61,7 +93,14 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  
+
+  &.fixed {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 20;
+  }
   &__logo {
     display: flex;
     align-items: center;
@@ -106,6 +145,42 @@ header {
     width: 17.9rem;
     height: 4.8rem;
     cursor: pointer;
+  }
+  &__mobile-menu {
+    display: none;
+  }
+
+  @media (max-width: 460px) {
+    &__logo-link {
+      display: none;
+    }
+    &__logo-img {
+      width: 2rem;
+    }
+    &__box, &__wallet {
+      width: auto;
+      height: auto;
+      white-space: nowrap;
+    }
+    &__box {
+      padding: 0.6rem 1rem;
+      margin-right: 0.8rem;
+    }
+    &__wallet {
+      padding: 0.5rem 1rem;
+    }
+    &__connect {
+      width: 10.1rem;
+      height: 2rem;
+      font-size: 1.3rem;
+      line-height: 1;
+    }
+    &__mobile-menu {
+      display: block;
+      width: 1.9rem;
+      margin-left: 2rem;
+      cursor: pointer;
+    }
   }
 }
 </style>

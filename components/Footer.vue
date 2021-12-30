@@ -72,6 +72,9 @@ footer {
 }
 
 @media(max-width: 460px) {
+  footer {
+    display: none;
+  }
   .footer {
     width: 100%;
     flex-wrap: wrap;

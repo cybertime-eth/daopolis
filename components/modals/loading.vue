@@ -46,6 +46,9 @@ export default {
       border: none;
       font-size: 1.3rem;
       color: $border;
+      @media(max-width: 460px) {
+        width: 100%;
+      }
     }
   }
 }

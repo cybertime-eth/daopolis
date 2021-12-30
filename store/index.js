@@ -19,12 +19,6 @@ export const state = () => ({
   nftList: []
 })
 
-const isMobile = () => {
-  const isMobile = /iphone|ipod|android|blackberry|opera|mini|windows\sce|palm|smartphone|iemobile/i.test(navigator.userAgent.toLowerCase()) && navigator.userAgent.search('PC') === -1
-  const isTablet = /ipad|nexus 7|nexus 9|android 3.0|kindle|silk|kftt|kfot|kfjwa|kfjwi|kfsowi|kfthwa|kfthwi|kfapwa|kfapwi/i.test(navigator.userAgent.toLowerCase()) && navigator.userAgent.search('PC') === -1
-  return isMobile || isTablet
-}
-
 export const getters = {
   provider() {
     const web3 = window.web3 && window.web3.eth && window.web3.eth.currentProvider.connected ? window.web3.eth : window.ethereum
@@ -37,15 +31,15 @@ export const getters = {
 }
 
 export const actions = {
-  async updateUser({getters, commit, dispatch}) {
-    if (isMobile()) {
-      localStorage.removeItem('address')
-    }
+  async updateUser({state, getters, commit, dispatch}) {
     if (localStorage.getItem('address') && !localStorage.getItem('walletconnect')) {
       try {
         const signer = await getters.provider.getSigner()
         const address = await signer.getAddress()
         commit('setAddress', address)
+        if (state.totalMintCount === 0) {
+          dispatch('updateTotalMintCount')
+        }
         if ($nuxt.$route.name === 'collection') {
           dispatch('getCollection')
         }
@@ -55,39 +49,22 @@ export const actions = {
     }
   },
   async updateTotalMintCount({commit, state, getters}) {
-    const web3 = new Web3(getters.provider)
+    if (!state.fullAddress) return
+    const web3 = new Web3(window.ethereum)
     const kit = ContractKit.newKitFromWeb3(web3)
     const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
     const totalSupply = await contract.methods.totalSupply().call()
     commit('setTotalMintCount', totalSupply)
   },
-  async connectMetaTrust({getters, commit, state}) {
+  async connectMetaTrust({getters, commit, dispatch}) {
     try {
-      if (isMobile()) {
-        alert(window.ethereum)
-        alert(window.web3)
-      }
       if (window.ethereum) {
         await window.ethereum.request({ method: 'eth_requestAccounts' })
         const address = await getters.provider.getSigner().getAddress();
         commit('setAddress', address)
-      }/* else if (window.web3) {
-        window.web3 = new ethers.providers.Web3Provider(
-          window.web3.currentProvider
-        );
-        const address = await getters.provider.getSigner().getAddress();
-        commit('setAddress', address)
-      } */else {
-        // alert("please use web3 enabled browser.");
-        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-        if (/android/i.test(userAgent)) {
-          const appLink = 'https://metamask.app.link/dapp/' + window.location.host
-          window.location.replace(appLink)
-        }
-        else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-          const appLink = 'metamask://'
-          window.location.href = appLink
-        }
+        dispatch('updateTotalMintCount')
+      } else {
+        alert("please use web3 enabled browser.");
       }
     } catch (error) {
       throw new Error(error);

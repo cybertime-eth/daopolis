@@ -10,7 +10,7 @@
         <img :src="nft.image" alt="item" class="collection__item-image">
         <div class="collection__item-info">
           <h2 class="collection__item-info-name">
-            Daopolis {{ nft.name }}
+            Daopolis #{{ nft.id }}
           </h2>
           <!-- <div class="collection__item-info-buttons">
             <button class="collection__item-info-buttons-transfer" @click="showTransfer = true">Transfer</button>
@@ -117,6 +117,20 @@ export default {
           width: 12.3rem;
           height: 4.3rem;
         }
+      }
+    }
+  }
+
+  @media(max-width: 460px) {
+    &__items {
+      grid-template-columns: 14.4rem 14.4rem
+    }
+    &__item {
+      width: 14.4rem;
+      height: 24.6rem;
+      &-image {
+        width: 14.4rem;
+        height: 14.4rem;
       }
     }
   }

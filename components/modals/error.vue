@@ -37,6 +37,9 @@ export default {
       padding-top: .6rem;
       width: 31.6rem;
       text-align: center;
+      @media(max-width: 460px) {
+        width: 100%;
+      }
     }
     &-close {
       margin-top: 1.6rem;
@@ -47,6 +50,9 @@ export default {
       border: none;
       font-size: 1.3rem;
       color: $border;
+      @media(max-width: 460px) {
+        width: 100%;
+      }
     }
   }
 }
