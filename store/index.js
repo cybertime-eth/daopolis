@@ -5,7 +5,7 @@ import daosABI from '../abi/daos.json'
 import { WHITELIST_ADDRESSES } from '@/constants'
 const ContractKit = require('@celo/contractkit')
 export const state = () => ({
-  daosContract: '0xc4ea80deCA2415105746639eC16cB0cF8378996A',
+  daosContract: '0x34d63dc2f8c5655bA6E05124B3D4a283A402CEd9',
   fullAddress: null,
   address: null,
   userInWhitelist: false,
