@@ -1,5 +1,5 @@
 import Web3 from 'web3'
-import { ethers, Wallet, providers } from 'ethers'
+import { ethers, BigNumber } from 'ethers'
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import daosABI from '../abi/daos.json'
 import { WHITELIST_ADDRESSES } from '@/constants'
@@ -8,6 +8,7 @@ export const state = () => ({
   daosContract: '0xc4ea80deCA2415105746639eC16cB0cF8378996A',
   fullAddress: null,
   address: null,
+  chainId: null,
   saleOpened: false,
   mintCount: 5,
   celoPrice: 2,
@@ -32,9 +33,17 @@ export const actions = {
   async updateUser({state, getters, commit, dispatch}) {
     if (localStorage.getItem('address') && !localStorage.getItem('walletconnect')) {
       try {
-        const signer = await getters.provider.getSigner()
+        const provider = getters.provider
+        const signer = await provider.getSigner()
         const address = await signer.getAddress()
+        const chain = await provider.getNetwork()
+        window.ethereum.on("chainChanged", async (chainId) => {
+          commit('setChainId', BigNumber.from(chainId).toNumber())
+          dispatch('updateTotalMintCount')
+        })
+
         commit('setAddress', address)
+        commit('setChainId', chain.chainId)
         if (state.totalMintCount === 0) {
           dispatch('updateTotalMintCount')
         }
@@ -47,7 +56,7 @@ export const actions = {
     }
   },
   async updateTotalMintCount({commit, state, getters}) {
-    if (!state.fullAddress) return
+    if (!state.fullAddress || state.chainId !== 42220) return
     const web3 = new Web3(window.ethereum)
     const kit = ContractKit.newKitFromWeb3(web3)
     const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
@@ -58,8 +67,11 @@ export const actions = {
     try {
       if (window.ethereum) {
         await window.ethereum.request({ method: 'eth_requestAccounts' })
-        const address = await getters.provider.getSigner().getAddress();
+        const provider = getters.provider
+        const address = await provider.getSigner().getAddress();
+        const chain = await provider.getNetwork()
         commit('setAddress', address)
+        commit('setChainId', chain.chainId)
         dispatch('updateTotalMintCount')
       } else {
         alert("please use web3 enabled browser.");
@@ -160,6 +172,9 @@ export const mutations = {
     if (WHITELIST_ADDRESSES.includes(address)) {
       state.saleOpened = true
     }
+  },
+  setChainId(state, chainId) {
+    state.chainId = chainId
   },
   setSaleOpened(state, saleOpened) {
     state.saleOpened = saleOpened

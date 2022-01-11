@@ -8,6 +8,10 @@
       </div>
     </nuxt-link>
 	  <div class="header__buttons">
+    <div class="header__error-network" v-if="showWrongNetwork && !isMobilePlatform">
+      <img src="/pulse.svg" alt="pulse">
+      <p class="header__error-network-text">You are on the wrong network</p>
+    </div>
 		<nuxt-link to="/collection"  v-if="address && saleOpened">
 		  <button class="header__box">
 			My collection
@@ -35,9 +39,16 @@ export default {
     return {
       image: false,
       showConnectModal: false,
+      showWrongNetwork: false,
       showProfileMenu: false,
       showProfileMenuMobile: false,
       isMobilePlatform: false
+    }
+  },
+  watch: {
+    chainId() {
+      const id = this.$store.state.chainId
+      id === 42220 || id === null ? this.showWrongNetwork = false :  this.showWrongNetwork = true
     }
   },
   components: {
@@ -51,6 +62,9 @@ export default {
     },
     address() {
       return this.$store.state.address
+    },
+    chainId() {
+      return this.$store.state.chainId
     },
     logoImage() {
       if (!this.isMobilePlatform) {
@@ -126,6 +140,22 @@ header {
   &__buttons {
 	display: flex;
 	align-items: center;
+  }
+  &__error {
+    &-network {
+      padding: 1.2rem .8rem;
+      background: $pink;
+      display: flex;
+      align-items: center;
+      border-radius: .8rem;
+      justify-self: flex-end;
+      margin-right: 2.25rem;
+      &-text {
+        color: $white;
+        padding-left: .8rem;
+        font-size: 0.9rem;
+      }
+    }
   }
   &__box {
 	margin-right: 30px;
