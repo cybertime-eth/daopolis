@@ -13,7 +13,7 @@
       <div class="home__info" v-else>
         <h1 class="home__info-name">Meet Daopolis Citizens</h1>
         <h3 class="home__info-description">Automatically generated 9192 NFT's. Born in the CyberTime era, Daopolis citizens will be the foundation of a new gaming metaverse on Celo. Find your digital avatar, gain access to a private club and participate in unique NFT games!</h3>
-		<div class="home__info-sale" v-if="openSaleUser">
+		<div class="home__info-sale" v-if="!saleOpened">
 		  <h3 class="home__info-sale-open" v-if="currSaleTime >= 0">Public sale will open soon</h3>
 		  <div class="home__info-sale-countdown" v-if="currSaleTime > 0">
 			<div class="home__info-sale-countdown-sector day-sector">{{ countdownDay }}</div>
@@ -26,7 +26,7 @@
 		  </div>
 		  <p class="home__info-sale-description" v-if="!isConnected">If you are on the whitelist, then connect and buy a collection at a low price.</p>
 		</div>
-		<div v-if="isConnected && !openSaleUser">
+		<div v-if="isConnected && saleOpened">
 		  <h3 class="home__info-minted">{{ totalMintCount }}/9192 minted</h3>
 		  <div class="home__info-count" v-if="totalMintCount >= 2000">
 		    <div class="home__info-count-line" :style="'width:' + widthLine + '%'"></div>
@@ -49,7 +49,7 @@
 		  </div>
 		</div>
 		<button class="home__info-connect" @click="showConnectModal = true" v-if="!isConnected">Connect Wallet</button>
-        <button class="home__info-buy" @click="handleClickBuy" v-else-if="!openSaleUser">Buy now</button>
+        <button class="home__info-buy" @click="handleClickBuy" v-else-if="saleOpened">Buy now</button>
       </div>
     </div>
     <Footer />
@@ -83,8 +83,8 @@ export default {
 	isConnected() {
 	  return this.$store.state.address
 	},
-	openSaleUser() {
-	  return !this.$store.state.userInWhitelist && this.currSaleTime >= 0
+	saleOpened() {
+	  return this.$store.state.saleOpened
 	},
 	countdownDay() {
 	  return this.getFormattedTime(this.currSaleTime / 3600 / 24)
@@ -148,7 +148,13 @@ export default {
 		setInterval(this.countdownSaleTime, 1000)
 	  } else if (diffSeconds < 0) {
 		this.currSaleTime = -1
+      } else {
+		this.$store.commit('setSaleOpened', true)	
 	  }
+
+      if (this.currSaleTime < 0) {
+        this.$store.commit('setSaleOpened', true)
+      }
 	}
   },
   methods: {

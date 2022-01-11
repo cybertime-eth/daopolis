@@ -8,7 +8,7 @@ export const state = () => ({
   daosContract: '0xc4ea80deCA2415105746639eC16cB0cF8378996A',
   fullAddress: null,
   address: null,
-  userInWhitelist: false,
+  saleOpened: false,
   mintCount: 5,
   celoPrice: 2,
   totalMintCount: 0,
@@ -158,8 +158,11 @@ export const mutations = {
       .join("");
     state.fullAddress = address
     if (WHITELIST_ADDRESSES.includes(address)) {
-      state.userInWhitelist = true
+      state.saleOpened = true
     }
+  },
+  setSaleOpened(state, saleOpened) {
+    state.saleOpened = saleOpened
   },
   setTotalMintCount(state, totalCount) {
     state.totalMintCount = totalCount

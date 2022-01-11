@@ -8,7 +8,7 @@
       </div>
     </nuxt-link>
 	  <div class="header__buttons">
-		<nuxt-link to="/collection"  v-if="address && !openSaleUser">
+		<nuxt-link to="/collection"  v-if="address && saleOpened">
 		  <button class="header__box">
 			My collection
 		  </button>
@@ -46,8 +46,8 @@ export default {
 	profileMenuMobile
   },
   computed: {
-    openSaleUser() {
-      return !this.$store.state.userInWhitelist
+    saleOpened() {
+      return this.$store.state.saleOpened
     },
     address() {
       return this.$store.state.address
