@@ -8,11 +8,11 @@
       </div>
     </nuxt-link>
 	  <div class="header__buttons">
-    <div class="header__error-network" v-if="showWrongNetwork && !isMobilePlatform">
+    <div class="header__error-network" v-if="showWrongNetwork">
       <img src="/pulse.svg" alt="pulse">
       <p class="header__error-network-text">You are on the wrong network</p>
     </div>
-		<nuxt-link to="/collection"  v-if="address && saleOpened">
+		<nuxt-link to="/collection"  v-if="!showWrongNetwork && address && saleOpened">
 		  <button class="header__box">
 			My collection
 		  </button>
@@ -39,16 +39,9 @@ export default {
     return {
       image: false,
       showConnectModal: false,
-      showWrongNetwork: false,
       showProfileMenu: false,
       showProfileMenuMobile: false,
       isMobilePlatform: false
-    }
-  },
-  watch: {
-    chainId() {
-      const id = this.$store.state.chainId
-      id === 42220 || id === null ? this.showWrongNetwork = false :  this.showWrongNetwork = true
     }
   },
   components: {
@@ -63,8 +56,8 @@ export default {
     address() {
       return this.$store.state.address
     },
-    chainId() {
-      return this.$store.state.chainId
+    showWrongNetwork() {
+      return this.$store.state.wrongNetwork
     },
     logoImage() {
       if (!this.isMobilePlatform) {
@@ -107,6 +100,7 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
 
   &.fixed {
 	position: fixed;
@@ -150,6 +144,9 @@ header {
       border-radius: .8rem;
       justify-self: flex-end;
       margin-right: 2.25rem;
+      img {
+        width: 1.35rem;
+      }
       &-text {
         color: $white;
         padding-left: .8rem;
@@ -186,6 +183,14 @@ header {
     }
     &__logo-img {
       width: 2rem;
+    }
+    &__error-network {
+      position: absolute;
+      right: 1.3rem;
+      top: 9.3rem;
+      &-text {
+        font-size: 1.2rem;
+      }
     }
     &__box, &__wallet {
       width: auto;

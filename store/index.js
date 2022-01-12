@@ -9,11 +9,13 @@ export const state = () => ({
   fullAddress: null,
   address: null,
   chainId: null,
+  wrongNetwork: false,
   saleOpened: false,
   mintCount: 5,
   celoPrice: 2,
   totalMintCount: 0,
   rejectBuyNft: false,
+  successAddedNetwork: false,
   successPurchasedNft: false,
   nftList: []
 })
@@ -38,12 +40,12 @@ export const actions = {
         const address = await signer.getAddress()
         const chain = await provider.getNetwork()
         window.ethereum.on("chainChanged", async (chainId) => {
-          commit('setChainId', BigNumber.from(chainId).toNumber())
+          dispatch('updateChainId', BigNumber.from(chainId).toNumber())
           dispatch('updateTotalMintCount')
         })
 
         commit('setAddress', address)
-        commit('setChainId', chain.chainId)
+        dispatch('updateChainId', chain.chainId)
         if (state.totalMintCount === 0) {
           dispatch('updateTotalMintCount')
         }
@@ -54,6 +56,11 @@ export const actions = {
         localStorage.removeItem('address')
       }
     }
+  },
+  updateChainId({commit, state}, chainId) {
+    commit('setChainId', chainId)
+    commit('setWrongNetwork', (chainId !== 42220))
+    commit('setSuccessAddedNetwork', false)
   },
   async updateTotalMintCount({commit, state, getters}) {
     if (!state.fullAddress || state.chainId !== 42220) return
@@ -71,7 +78,7 @@ export const actions = {
         const address = await provider.getSigner().getAddress();
         const chain = await provider.getNetwork()
         commit('setAddress', address)
-        commit('setChainId', chain.chainId)
+        dispatch('updateChainId', chain.chainId)
         dispatch('updateTotalMintCount')
       } else {
         alert("please use web3 enabled browser.");
@@ -96,6 +103,33 @@ export const actions = {
       await provider.enable();
     }
     window.web3 = new Web3(provider);
+  },
+  async addCeloNetwork({commit}) {
+    try {
+      await window.ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [{
+          "chainId": "0xa4ec",
+          "chainName": "Celo (Mainnet)",
+          "rpcUrls": [
+            "https://forno.celo.org"
+          ],
+          "nativeCurrency": {
+            "name": "Celo",
+            "symbol": "CELO",
+            "decimals": 18
+          },
+          "iconUrls": [
+            "future",
+          ],
+          "blockExplorerUrls": [
+            "https://explorer.celo.org"
+          ]
+      }]})
+      commit('setSuccessAddedNetwork', true)
+    } catch(e) {
+      console.log(e)
+    }
   },
   async getCollection({commit, state}, fetchMints = false) {
     if (state.fullAddress) {
@@ -176,6 +210,9 @@ export const mutations = {
   setChainId(state, chainId) {
     state.chainId = chainId
   },
+  setWrongNetwork(state, wrongNetwork) {
+    state.wrongNetwork = wrongNetwork
+  },
   setSaleOpened(state, saleOpened) {
     state.saleOpened = saleOpened
   },
@@ -187,6 +224,9 @@ export const mutations = {
   },
   setCeloPrice(state, price) {
     state.celoPrice = price
+  },
+  setSuccessAddedNetwork(state, successAddedNetwork) {
+    state.successAddedNetwork = successAddedNetwork
   },
   setRejectBuyNft(state, rejectBuyNft) {
     state.rejectBuyNft = rejectBuyNft

@@ -1,55 +1,79 @@
 <template>
   <section id="home">
-    <div class="home container-xl">
+    <div class="home container-xl" :class="{'wrong-network': wrongNetwork}">
       <video src="/daopolis-movie.MP4" class="home__image" autoplay muted loop></video>
-	    <div class="home__main" v-if="currentStep === 0">
-        <h1 class="home__main-name">Meet Daopolis Citizens</h1>
-        <h3 class="home__main-description">Automatically generated 9192 NFT's. Born in the CyberTime era, Daopolis
-          citizens will be the foundation of a new gaming metaverse on Celo. Find your digital avatar, gain access
-          to a private club and participate in unique NFT games!</h3>
-        <h3 class="home__main-minted">Access to the whitelist allows minting NFTs from just 2 CELO. Get on the list today!</h3>
-        <a href="https://discord.gg/cKcWfCux4s" target="_blank"><button class="home__main-buy" >Get into whitelist</button></a>
-      </div>
-      <div class="home__info" v-else>
+      <div class="home__info">
         <h1 class="home__info-name">Meet Daopolis Citizens</h1>
-        <h3 class="home__info-description">Automatically generated 9192 NFT's. Born in the CyberTime era, Daopolis citizens will be the foundation of a new gaming metaverse on Celo. Find your digital avatar, gain access to a private club and participate in unique NFT games!</h3>
-		<div class="home__info-sale" v-if="!saleOpened">
-		  <h3 class="home__info-sale-open" v-if="currSaleTime >= 0">Public sale will open soon</h3>
-		  <div class="home__info-sale-countdown" v-if="currSaleTime > 0">
-			<div class="home__info-sale-countdown-sector day-sector">{{ countdownDay }}</div>
-			<span>:</span>
-			<div class="home__info-sale-countdown-sector hour-sector">{{ countdownHour }}</div>
-			<span>:</span>
-			<div class="home__info-sale-countdown-sector minute-sector">{{ countdownMinute }}</div>
-			<span>:</span>
-			<div class="home__info-sale-countdown-sector second-sector">{{ countdownSeconds }}</div>
-		  </div>
-		  <p class="home__info-sale-description" v-if="!isConnected">If you are on the whitelist, then connect and buy a collection at a low price.</p>
+        <h3 class="home__info-description">{{ homeDescription }}</h3>
+		<div class="home__info-network" v-if="wrongNetwork">
+			<div class="home__info-network-box">
+				<img src="/pulse-pink.svg" alt="pulse">
+				<span class="home__info-network-status">You are on the wrong network</span>
+			</div>
+			<div class="home__info-network-add">
+				<div class="home__info-network-add-name">Switch to the Celo Network</div>
+				<div class="home__info-network-add-description">Click the button below to switch to Celo Network as custom network in your Metamask wallet.</div>
+			</div>
+			<button class="home__info-add-network" @click="handleClickAddNetwork">Switch to Celo Network</button>
+			<div class="home__info-network-manual">
+				<button class="home__info-add-manually" @click="showManualNetwork = !showManualNetwork"><span>{{ !showManualNetwork ? '+' : '-' }}</span>Manually add the network instead</button>
+				<div class="home__info-network-manual-detail" v-if="showManualNetwork">
+					<div class="home__info-manual-description">Use the following table to add a custom network RPC manually:</div>
+					<div class="home__info-network-manual-detail-box">
+						<div class="home__info-network-manual-detail-box-info">Network Name:<b>Celo Mainnet</b></div>
+						<div class="home__info-network-manual-detail-box-info">New RPC URL:<a href="https://forno.celo.org" target="_blank">https://forno.celo.org</a></div>
+						<div class="home__info-network-manual-detail-box-info">Chain ID:<b>42220</b></div>
+						<div class="home__info-network-manual-detail-box-info">Currency Symbol (optional):<b>CELO</b></div>
+						<div class="home__info-network-manual-detail-box-info">Block Explorer URL (optional):<a href="https://explorer.celo.org" target="_blank">https://explorer.celo.org</a></div>
+					</div>
+					<a class="home__info-network-manual-link" href="https://metamask.zendesk.com/hc/en-us/articles/360043227612-How-to-add-a-custom-network-RPC" target="_blank">Metamask FAQ: How to add custom Network RPC →</a>
+				</div>
+			</div>
+			<div class="home__info-network-alert" v-if="showNetworkAlert">
+				<img class="home__info-network-alert-icon" src="/check.svg" alt="check" v-if="!isMobile()">
+				<img class="home__info-network-alert-icon" src="/check-mark.svg" alt="check" v-else>
+				<span class="home__info-network-alert-description">Network successfully added to MetaMask</span>
+			</div>
 		</div>
-		<div v-if="isConnected && saleOpened">
-		  <h3 class="home__info-minted">{{ totalMintCount }}/9192 minted</h3>
-		  <div class="home__info-count" v-if="totalMintCount >= 2000">
-		    <div class="home__info-count-line" :style="'width:' + widthLine + '%'"></div>
-		    <div class="home__info-count-prices">
-		  	  <div class="home__info-count-price" :key="index" v-for="(price, index) in celoPrices">
-		  	    <img src="/dot.png" alt="dot" class="home__info-count-price-dot">
-		  	    <h4 class="home__info-count-price-celo">{{ price }} celo</h4>
-		  	  </div>
-		    </div>
-		  </div>
-		  <div class="home__info-price" v-if="totalMintCount >= 2000"><img src="/celo.png" alt="celo"><h3>{{ totalCeloPrice }} CELO</h3></div>
-		  <div class="home__info-select">
-		    <p class="home__info-select-title">Select the amount of NFT you want to buy</p>
-		    <div class="home__info-select-buttons">
-		  	  <button class="home__info-select-buttons-button" :class="{selected: buyCount === 1}" @click="handleClickBuyCount(1)">1</button>
-		  	  <button class="home__info-select-buttons-button" :class="{selected: buyCount === 5}" @click="handleClickBuyCount(5)">5</button>
-		  	  <button class="home__info-select-buttons-button" :class="{selected: buyCount === 10}" @click="handleClickBuyCount(10)">10</button>
-		  	  <button class="home__info-select-buttons-button" :class="{selected: buyCount === 20}" @click="handleClickBuyCount(20)">20</button>
-		    </div>
-		  </div>
+		<div v-else>
+			<div class="home__info-sale" v-if="!saleOpened">
+			<h3 class="home__info-sale-open" v-if="currSaleTime >= 0">Public sale will open soon</h3>
+			<div class="home__info-sale-countdown" v-if="currSaleTime > 0">
+				<div class="home__info-sale-countdown-sector day-sector">{{ countdownDay }}</div>
+				<span>:</span>
+				<div class="home__info-sale-countdown-sector hour-sector">{{ countdownHour }}</div>
+				<span>:</span>
+				<div class="home__info-sale-countdown-sector minute-sector">{{ countdownMinute }}</div>
+				<span>:</span>
+				<div class="home__info-sale-countdown-sector second-sector">{{ countdownSeconds }}</div>
+			</div>
+			<p class="home__info-sale-description" v-if="!isConnected">If you are on the whitelist, then connect and buy a collection at a low price.</p>
+			</div>
+			<div v-if="isConnected && saleOpened">
+				<h3 class="home__info-minted">{{ totalMintCount }}/9192 minted</h3>
+				<div class="home__info-count" v-if="totalMintCount >= 2000">
+					<div class="home__info-count-line" :style="'width:' + widthLine + '%'"></div>
+					<div class="home__info-count-prices">
+						<div class="home__info-count-price" :key="index" v-for="(price, index) in celoPrices">
+							<img src="/dot.png" alt="dot" class="home__info-count-price-dot">
+							<h4 class="home__info-count-price-celo">{{ price }} celo</h4>
+						</div>
+					</div>
+				</div>
+				<div class="home__info-price" v-if="totalMintCount >= 2000"><img src="/celo.png" alt="celo"><h3>{{ totalCeloPrice }} CELO</h3></div>
+				<div class="home__info-select">
+					<p class="home__info-select-title">Select the amount of NFT you want to buy</p>
+					<div class="home__info-select-buttons">
+						<button class="home__info-select-buttons-button" :class="{selected: buyCount === 1}" @click="handleClickBuyCount(1)">1</button>
+						<button class="home__info-select-buttons-button" :class="{selected: buyCount === 5}" @click="handleClickBuyCount(5)">5</button>
+						<button class="home__info-select-buttons-button" :class="{selected: buyCount === 10}" @click="handleClickBuyCount(10)">10</button>
+						<button class="home__info-select-buttons-button" :class="{selected: buyCount === 20}" @click="handleClickBuyCount(20)">20</button>
+					</div>
+				</div>
+			</div>
+			<button class="home__info-buy" @click="handleClickBuy" v-if="isConnected && saleOpened">Buy now</button>
 		</div>
 		<button class="home__info-connect" @click="showConnectModal = true" v-if="!isConnected">Connect Wallet</button>
-        <button class="home__info-buy" @click="handleClickBuy" v-else-if="saleOpened">Buy now</button>
       </div>
     </div>
     <Footer />
@@ -69,10 +93,10 @@ import { DISTRIBUTED_CELO_PRICES, SALE_START_TIME, SALE_TIMEZONE_UTC, OPEN_SALE_
 export default {
   data() {
     return {
-      showAlertLoad: false,
+	  showAlertLoad: false,
+	  showManualNetwork: false,
 	  showConnectModal: false,
       countCards: 1,
-      currentStep: 1,
       countMinted: 1650,
       maxCountMinted: 8846,
 	  widthLine: 33,
@@ -82,6 +106,20 @@ export default {
   computed: {
 	isConnected() {
 	  return this.$store.state.address
+	},
+	wrongNetwork() {
+	  return this.$store.state.wrongNetwork
+	},
+	showNetworkAlert() {
+		return this.$store.state.successAddedNetwork
+	},
+	homeDescription() {
+	  if (!this.isConnected) {
+		return "Automatically generated 9192 NFT's. Born in the CyberTime era, Daopolis citizens will be the foundation of a new gaming metaverse on Celo. Find your digital avatar, gain access to a private club and participate in unique NFT games!"
+	  } else {
+		return "8,640 automatically generated NFT's for Daopolis play-to-earn game"
+	  }
+	  
 	},
 	saleOpened() {
 	  return this.$store.state.saleOpened
@@ -180,10 +218,13 @@ export default {
     countdownSaleTime() {
 	  this.currSaleTime = this.currSaleTime - 1
 	},
+	handleClickAddNetwork() {
+      this.$store.dispatch('addCeloNetwork')
+    },
     handleClickBuy() {
 	  this.showAlertLoad = true
       this.$store.dispatch('buyNft')
-    },
+    }
   },
   components: {
 	Connect,
@@ -251,9 +292,86 @@ export default {
 	  }
 	}
     &-description {
-      font-size: 1.8rem;
+	  font-weight: 400;
+      font-size: 1.35rem;
       padding-top: 1rem;
-    }
+	}
+	&-network {
+	  margin-top: 3.45rem;
+	  &-box {
+		display: flex;
+		align-items: flex-end;
+		img {
+		  margin-right: 0.6rem;
+		}
+	  }
+	  &-status {
+		line-height: 1;
+		font-size: 1.2rem;
+		color: $pink2;
+	  }
+	  &-add {
+		margin-top: 1.2rem;
+		color: $white;
+		&-name {
+		  font-size: 1.2rem;
+		  font-weight: 600;
+		}
+		&-description {
+		  margin-top: 0.6rem;
+		  font-size: 1.06rem;
+		  color: $white;
+		}
+	  }
+	  &-manual {
+		&-detail {
+		  padding: 1.2rem 0;
+		  color: $white;
+		  &-box {
+			background: $gray3;
+			margin: 1.5rem 0;
+			padding: 0.75rem;
+			&-info {
+			  padding-top: 1.2rem;
+			  font-size: 1.2rem;
+			  color: $white;
+			  a, b {
+				margin-left: 0.75rem;
+				font-weight: 600;
+				font-size: 1.2rem;
+				color: $white;
+			  }
+			  &:first-child {
+				padding: 0;
+			  }
+			}
+		  }
+		}
+		&-link {
+		  font-size: 1.06rem;
+		  color: $lightBlue;
+		}
+	  }
+		&-alert {
+			position: fixed;
+			left: calc((100vw - 121rem) / 2);
+			bottom: 0.5rem;
+			display: flex;
+			align-items: center;
+			width: auto;
+			background: $green2;
+			padding: 0.9rem 1.64rem;
+			border-radius: 7px;
+			&-icon {
+				margin-right: 0.9rem;
+			}
+			&-description {
+				font-weight: 700;
+				font-size: 1.2rem;
+				color: $white;
+			}
+		}
+	}
     &-select {
       padding-top: 3.6rem;
       &-buttons {
@@ -324,15 +442,31 @@ export default {
       h3 {
         font-size: 1.8rem;
       }
-    }
-    &-connect, &-buy {
+	}
+	&-add-manually {
+	  background: transparent;
+	  border: 0;
+	  font-size: 1.06rem;
+	  span {
+		margin-right: 0.6rem;
+	  }
+	}
+    &-add-network, &-connect, &-buy {
       margin-top: 4rem;
       background: $green;
       width: 100%;
       height: 5.8rem;
       border-radius: 3rem;
       font-size: 1.8rem;
-    }
+	}
+	&-add-network {
+	  width: auto;
+	  height: auto;
+	  padding: 1.27rem 4.4rem;
+	  margin: 1.8rem 0;
+	  background: transparent;
+	  border: 1px solid $green;
+	}
   }
   &__main {
     &-name {
@@ -358,7 +492,7 @@ export default {
       height: 5.8rem;
       border-radius: 3rem;
       font-size: 1.8rem;
-    }
+	}
   }
 
   @media(max-width: 460px) {
@@ -390,7 +524,13 @@ export default {
       padding-top: 3.6rem;
       &-name, &-description, &-minted, &-sale-open, &-sale-description {
         text-align: center;
-      }
+			}
+			&-name {
+				font-size: 1.8rem;
+			}
+			&-description {
+				font-size: 1.4rem;
+			}
       &-minted {
         padding-top: 3.6rem;
       }
@@ -410,11 +550,50 @@ export default {
       }
       &-sale-countdown {
         justify-content: center;
-	  }
-	  &-count-prices {
-		width: 29rem;
-	  }
-    }
+			}
+			&-count-prices {
+				width: 29rem;
+			}
+			&-network-status, &-network-add-name, &-network-manual-detail-box-info {
+				font-size: 1.6rem;
+				a, b {
+					font-size: 1.6rem;
+				}
+			}
+			&-network-add-description, &-add-manually,
+			&-manual-description, &-network-manual-link {
+				font-size: 1.4rem;
+			}
+			&-add-network {
+				font-size: 1.8rem;
+			}
+		}
+		
+		&.wrong-network {
+			padding-top: 7rem;
+			.home__info {
+				&-name, &-description {
+					text-align: left;
+				}
+				&-add-network {
+					width: 100%;
+				}
+				&-network-alert {
+					left: 0;
+					top: auto;
+					bottom: 0;
+					right: 0;
+					padding: 1.2rem 0.8rem;
+					border-bottom-left-radius: 0;
+					border-bottom-right-radius: 0;
+					background: $white;
+					&-description {
+						color: $gray4;
+						font-size: 1.4rem;
+					}
+				}
+			}
+		}
   }
 }
 </style>
