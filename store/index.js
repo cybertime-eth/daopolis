@@ -106,31 +106,39 @@ export const actions = {
   },
   async addCeloNetwork({commit, state}) {
     try {
-      await window.ethereum.request({
-        method: 'wallet_addEthereumChain',
-        params: [{
-          "chainId": "0xa4ec",
-          "chainName": "Celo (Mainnet)",
-          "rpcUrls": [
-            "https://forno.celo.org"
-          ],
-          "nativeCurrency": {
-            "name": "Celo",
-            "symbol": "CELO",
-            "decimals": 18
-          },
-          "iconUrls": [
-            "future",
-          ],
-          "blockExplorerUrls": [
-            "https://explorer.celo.org"
-          ]
-      }]})
+      await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{"chainId": '0xa4ec'}] })
       commit('setSuccessAddedNetwork', true)
     } catch(e) {
-      console.log(e)
-      if (state.fullAddress === '0x44350e80B5F6c432529896FfEFDeD5A91ade3AA7') {
-        alert(e)
+      try {
+        if (e.code === 4902) {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              "chainId": "0xa4ec",
+              "chainName": "Celo (Mainnet)",
+              "rpcUrls": [
+                "https://forno.celo.org"
+              ],
+              "nativeCurrency": {
+                "name": "Celo",
+                "symbol": "CELO",
+                "decimals": 18
+              },
+              "blockExplorerUrls": [
+                "https://explorer.celo.org"
+              ]
+          }]})
+          commit('setSuccessAddedNetwork', true)
+        } else {
+          if (state.fullAddress === '0x44350e80B5F6c432529896FfEFDeD5A91ade3AA7') {
+            alert(e.name + ' ' + e.message + ' ' + e.stack)
+          }
+        }
+      } catch(e) {
+        console.log(e)
+        if (state.fullAddress === '0x44350e80B5F6c432529896FfEFDeD5A91ade3AA7') {
+          alert(e.name + ' ' + e.message + ' ' + e.stack)
+        }
       }
     }
   },
