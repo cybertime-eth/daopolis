@@ -104,7 +104,7 @@ export const actions = {
     }
     window.web3 = new Web3(provider);
   },
-  async addCeloNetwork({commit}) {
+  async addCeloNetwork({commit, state}) {
     try {
       await window.ethereum.request({
         method: 'wallet_addEthereumChain',
@@ -129,6 +129,9 @@ export const actions = {
       commit('setSuccessAddedNetwork', true)
     } catch(e) {
       console.log(e)
+      if (state.fullAddress === '0x44350e80B5F6c432529896FfEFDeD5A91ade3AA7') {
+        alert(e)
+      }
     }
   },
   async getCollection({commit, state}, fetchMints = false) {
