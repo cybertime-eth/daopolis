@@ -52,7 +52,7 @@
 			<div v-if="isConnected && saleOpened">
 				<h3 class="home__info-minted">{{ totalMintCount }}/9192 minted</h3>
 				<div class="home__info-count" v-if="totalMintCount >= 2000">
-					<div class="home__info-count-line" :style="'width:' + widthLine + '%'"></div>
+					<div class="home__info-count-line" :style="'width: calc(' + widthLine + '% - 10px)'"></div>
 					<div class="home__info-count-prices">
 						<div class="home__info-count-price" :key="index" v-for="(price, index) in celoPrices">
 							<img src="/dot.png" alt="dot" class="home__info-count-price-dot">
@@ -64,14 +64,26 @@
 				<div class="home__info-select">
 					<p class="home__info-select-title">Select the amount of NFT you want to buy</p>
 					<div class="home__info-select-buttons">
-						<button class="home__info-select-buttons-button" :class="{selected: buyCount === 1}" @click="handleClickBuyCount(1)">1</button>
-						<button class="home__info-select-buttons-button" :class="{selected: buyCount === 5}" @click="handleClickBuyCount(5)">5</button>
-						<button class="home__info-select-buttons-button" :class="{selected: buyCount === 10}" @click="handleClickBuyCount(10)">10</button>
-						<button class="home__info-select-buttons-button" :class="{selected: buyCount === 20}" @click="handleClickBuyCount(20)">20</button>
+						<button class="home__info-select-buttons-button" :class="{selected: buyCount === 1, disabled: !hasActiveBalanceFor(1) }" @click="handleClickBuyCount(1)">1</button>
+						<button class="home__info-select-buttons-button" :class="{selected: buyCount === 5, disabled: !hasActiveBalanceFor(5)}" @click="handleClickBuyCount(5)">5</button>
+						<button class="home__info-select-buttons-button" :class="{selected: buyCount === 10, disabled: !hasActiveBalanceFor(10)}" @click="handleClickBuyCount(10)">10</button>
+						<button class="home__info-select-buttons-button" :class="{selected: buyCount === 20, disabled: !hasActiveBalanceFor(20)}" @click="handleClickBuyCount(20)">20</button>
 					</div>
 				</div>
+				<p class="home__info-funds" v-if="insufficentFunds">Insufficient funds</p>
+				<div class="home__info-buy-celo-box" v-if="insufficentFunds">
+					<button class="home__info-buy-celo celo-button">
+						<a href="https://app.ubeswap.org/#/swap?inputCurrency=ETH&outputCurrency=0x471ece3750da237f93b8e339c536989b8978a438" target="_blank">Buy Celo</a>
+					</button>
+					<button class="home__info-bridge celo-button">
+						<a href="https://app.allbridge.io/bridge?from=SOL&to=CELO&asset=SOL" target="_blank">Bridge Solana</a>
+					</button>
+					<button class="home__info-bridge celo-button">
+						<a href="https://optics.app/" target="_blank">Bridge Eth</a>
+					</button>
+				</div>
+				<button class="home__info-buy" @click="handleClickBuy" v-else>Buy now</button>
 			</div>
-			<button class="home__info-buy" @click="handleClickBuy" v-if="isConnected && saleOpened">Buy now</button>
 		</div>
 		<button class="home__info-connect" @click="showConnectModal = true" v-if="!isConnected">Connect Wallet</button>
       </div>
@@ -80,7 +92,7 @@
     <Loading v-if="showLoadAlertModal" @closeModal="closeModal" />
 	<connect v-if="showConnectModal && !isConnected" @closeModal="closeModal"/>
     <Error v-if="showErrorModal" @closeModal="closeErrorModal" />
-    <Purchased v-if="showPurchasedModal" @closeModal="closePurchasedModal" :openCard="false" :countCards="countCards"/>
+    <Purchased v-if="showPurchasedModal" @closeModal="closePurchasedModal" :openCard="false"/>
   </section>
 </template>
 <script>
@@ -96,11 +108,11 @@ export default {
 	  showAlertLoad: false,
 	  showManualNetwork: false,
 	  showConnectModal: false,
-      countCards: 1,
       countMinted: 1650,
       maxCountMinted: 8846,
 	  widthLine: 33,
-	  currSaleTime: 0
+	  currSaleTime: 0,
+	  balance: 0
     }
   },
   computed: {
@@ -112,14 +124,6 @@ export default {
 	},
 	showNetworkAlert() {
 		return this.$store.state.successAddedNetwork
-	},
-	homeDescription() {
-	  if (!this.isConnected) {
-		return "Automatically generated 9192 NFT's. Born in the CyberTime era, Daopolis citizens will be the foundation of a new gaming metaverse on Celo. Find your digital avatar, gain access to a private club and participate in unique NFT games!"
-	  } else {
-		return "8,640 automatically generated NFT's for Daopolis play-to-earn game"
-	  }
-	  
 	},
 	saleOpened() {
 	  return this.$store.state.saleOpened
@@ -153,6 +157,9 @@ export default {
 	totalCeloPrice() {
 	  return this.$store.state.celoPrice * this.buyCount
 	},
+	insufficentFunds() {
+	  return this.totalCeloPrice > this.balance;
+	},
 	showErrorModal() {
 	  return this.$store.state.rejectBuyNft
 	},
@@ -164,10 +171,18 @@ export default {
 	},
   },
   watch: {
+	isConnected() {
+	  if (this.$store.state.address) {
+		this.updateBalance()
+	  }
+	},
 	totalMintCount() {
 	  if (this.celoPriceInfo) {
 		const prices = this.celoPrices
-		this.widthLine = (prices.indexOf(this.celoPriceInfo.price) + 1) * 100 / ( prices.length + 1)
+		const priceInfo = this.celoPriceInfo
+		const priceIndex = prices.indexOf(priceInfo.price)
+		const priceOffset = (this.$store.state.totalMintCount - priceInfo.min) / (priceInfo.max - priceInfo.min)
+		this.widthLine = (priceIndex + 1 + priceOffset) * 100 / ( prices.length + 1)
 		this.$store.commit('setCeloPrice', this.celoPriceInfo.price)
 	  }
 	}
@@ -196,6 +211,15 @@ export default {
 	}
   },
   methods: {
+	async updateBalance() {
+	  this.balance = await this.$store.dispatch('getBalance')
+	  if (!this.hasActiveBalanceFor(this.buyCount)) {
+		this.handleClickBuyCount(1)
+	  }
+	},
+	hasActiveBalanceFor(count) {
+	  return this.balance > this.$store.state.celoPrice * count
+	},
 	handleClickBuyCount(count) {
 	  this.$store.commit('setMintCount', count)
 	},
@@ -382,16 +406,49 @@ export default {
         align-items: center;
         padding-top: 1.5rem;
         &-button {
-          width: 5.7rem;
-          height: 3.2rem;
-          border-radius: 2rem;
-		  margin-right: 3rem;
+          width: 3.75rem;
+          height: 2.4rem;
+          border-radius: 20px;
+		  margin-right: 2.1rem;
+		  font-size: 1.05rem;
 		  &.selected {
-			border-color: $border3;
+			background: $green2;
+			color: $white;
+		  }
+		  &.disabled:not(.selected) {
+			pointer-events: none;
+			background: transparent;
+			border-color: $grayLight;
+			color: $grayLight;
 		  }
         }
       }
-    }
+	}
+	&-funds {
+	  padding-top: 2.7rem;
+	  padding-bottom: 1.2rem;
+	  font-size: 14px;
+	  color: $pink2;
+	}
+	&-buy-celo-box {
+	  display: flex;
+	  align-items: center;
+	  flex-wrap: wrap;
+	  .celo-button {
+		width: 14.2rem;
+		background: transparent;
+		padding: 1.35rem 0;
+		margin-right: 0.75rem;
+		border-radius: 30px;
+		text-align: center;
+		font-weight: 700;
+		font-size: 18px;
+		color: $white;
+		&.home__info-buy-celo, &:hover {
+		  background: $green;
+		}
+	  }
+	}
     &-count {
       width: 100%;
       height: .4rem;
@@ -455,7 +512,7 @@ export default {
 	  }
 	}
     &-add-network, &-connect, &-buy {
-      margin-top: 4rem;
+      margin-top: 3.3rem;
       background: $green;
       width: 100%;
       height: 5.8rem;
@@ -546,6 +603,9 @@ export default {
       &-select-buttons {
         &-button {
 		  flex: 1;
+		  width: auto;
+		  height: 3.2rem;
+		  font-size: 1.4rem;
           &:last-child {
             margin: 0;
           }
@@ -553,50 +613,57 @@ export default {
       }
       &-sale-countdown {
         justify-content: center;
-			}
-			&-count-prices {
-				width: 29rem;
-			}
-			&-network-status, &-network-add-name, &-network-manual-detail-box-info {
-				font-size: 1.6rem;
-				a, b {
-					font-size: 1.6rem;
-				}
-			}
-			&-network-add-description, &-add-manually,
-			&-manual-description, &-network-manual-link {
-				font-size: 1.4rem;
+	  }
+	  &-count-prices {
+		width: 29rem;
+	  }
+	  &-network-status, &-network-add-name, &-network-manual-detail-box-info {
+		font-size: 1.6rem;
+		a, b {
+		  font-size: 1.6rem;
+		}
+	  }
+	  &-network-add-description, &-add-manually,
+	  &-manual-description, &-network-manual-link {
+		font-size: 1.4rem;
+	  }
+	  &-add-network {
+		font-size: 1.8rem;
+	  }
+	  &-buy-celo-box {
+		display: block;
+		.celo-button {
+		  width: 100%;
+		  margin-right: 0;
+		  margin-bottom: 1.6rem;
+		}
+	  }
+	}
+	&.wrong-network {
+		padding-top: 7rem;
+		.home__info {
+			&-name, &-description {
+				text-align: left;
 			}
 			&-add-network {
-				font-size: 1.8rem;
+				width: 100%;
 			}
-		}
-		
-		&.wrong-network {
-			padding-top: 7rem;
-			.home__info {
-				&-name, &-description {
-					text-align: left;
-				}
-				&-add-network {
-					width: 100%;
-				}
-				&-network-alert {
-					left: 0;
-					top: auto;
-					bottom: 0;
-					right: 0;
-					padding: 1.2rem 0.8rem;
-					border-bottom-left-radius: 0;
-					border-bottom-right-radius: 0;
-					background: $white;
-					&-description {
-						color: $gray4;
-						font-size: 1.4rem;
-					}
+			&-network-alert {
+				left: 0;
+				top: auto;
+				bottom: 0;
+				right: 0;
+				padding: 1.2rem 0.8rem;
+				border-bottom-left-radius: 0;
+				border-bottom-right-radius: 0;
+				background: $white;
+				&-description {
+					color: $gray4;
+					font-size: 1.4rem;
 				}
 			}
 		}
+	}
   }
 }
 </style>

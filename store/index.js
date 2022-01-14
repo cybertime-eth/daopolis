@@ -137,6 +137,12 @@ export const actions = {
       }
     }
   },
+  async getBalance({state}) {
+    const web3 = new Web3(window.ethereum)
+    const kit = ContractKit.newKitFromWeb3(web3)
+    const res = await kit.getTotalBalance(state.fullAddress)
+    return res.CELO.c[0] / 10000
+  },
   async getCollection({commit, state}, fetchMints = false) {
     if (state.fullAddress) {
       const web3 = new Web3(window.ethereum)
