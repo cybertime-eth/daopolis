@@ -130,15 +130,10 @@ export const actions = {
           }]})
           commit('setSuccessAddedNetwork', true)
         } else {
-          if (state.fullAddress === '0x44350e80B5F6c432529896FfEFDeD5A91ade3AA7') {
-            alert(e.name + ' ' + e.message + ' ' + e.stack)
-          }
+          console.log(e)
         }
       } catch(e) {
         console.log(e)
-        if (state.fullAddress === '0x44350e80B5F6c432529896FfEFDeD5A91ade3AA7') {
-          alert(e.name + ' ' + e.message + ' ' + e.stack)
-        }
       }
     }
   },

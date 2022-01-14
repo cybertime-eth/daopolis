@@ -18,7 +18,7 @@
 			<div class="home__info-network-manual">
 				<button class="home__info-add-manually" @click="showManualNetwork = !showManualNetwork"><span>{{ !showManualNetwork ? '+' : '-' }}</span>Manually add the network instead</button>
 				<div class="home__info-network-manual-detail" v-if="showManualNetwork">
-					<div class="home__info-manual-description">Use the following table to add a custom network RPC manually:</div>
+					<div class="home__info-network-manual-description">Use the following table to add a custom network RPC manually:</div>
 					<div class="home__info-network-manual-detail-box">
 						<div class="home__info-network-manual-detail-box-info">Network Name:<b>Celo Mainnet</b></div>
 						<div class="home__info-network-manual-detail-box-info">New RPC URL:<a href="https://forno.celo.org" target="_blank">https://forno.celo.org</a></div>
@@ -252,7 +252,7 @@ export default {
   }
   &__info {
     &-name {
-      font-size: 2.8rem;
+      font-size: 28px;
       letter-spacing: 0.1em;
       text-transform: uppercase;
     }
@@ -293,7 +293,7 @@ export default {
 	}
     &-description {
 	  font-weight: 400;
-      font-size: 1.35rem;
+      font-size: 18px;
       padding-top: 1rem;
 	}
 	&-network {
@@ -307,23 +307,26 @@ export default {
 	  }
 	  &-status {
 		line-height: 1;
-		font-size: 1.2rem;
+		font-size: 16px;
 		color: $pink2;
 	  }
 	  &-add {
 		margin-top: 1.2rem;
 		color: $white;
 		&-name {
-		  font-size: 1.2rem;
+		  font-size: 16px;
 		  font-weight: 600;
 		}
 		&-description {
 		  margin-top: 0.6rem;
-		  font-size: 1.06rem;
+		  font-size: 14px;
 		  color: $white;
 		}
 	  }
 	  &-manual {
+			&-description {
+				font-size: 14px;
+			}
 		&-detail {
 		  padding: 1.2rem 0;
 		  color: $white;
@@ -333,12 +336,12 @@ export default {
 			padding: 0.75rem;
 			&-info {
 			  padding-top: 1.2rem;
-			  font-size: 1.2rem;
+			  font-size: 16px;
 			  color: $white;
 			  a, b {
 				margin-left: 0.75rem;
 				font-weight: 600;
-				font-size: 1.2rem;
+				font-size: 16px;
 				color: $white;
 			  }
 			  &:first-child {
@@ -348,7 +351,7 @@ export default {
 		  }
 		}
 		&-link {
-		  font-size: 1.06rem;
+		  font-size: 14px;
 		  color: $lightBlue;
 		}
 	  }
@@ -446,7 +449,7 @@ export default {
 	&-add-manually {
 	  background: transparent;
 	  border: 0;
-	  font-size: 1.06rem;
+	  font-size: 14px;
 	  span {
 		margin-right: 0.6rem;
 	  }
@@ -457,7 +460,7 @@ export default {
       width: 100%;
       height: 5.8rem;
       border-radius: 3rem;
-      font-size: 1.8rem;
+      font-size: 18px;
 	}
 	&-add-network {
 	  width: auto;
