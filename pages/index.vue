@@ -76,10 +76,10 @@
 						<a href="https://app.ubeswap.org/#/swap?inputCurrency=ETH&outputCurrency=0x471ece3750da237f93b8e339c536989b8978a438" target="_blank">Buy Celo</a>
 					</button>
 					<button class="home__info-bridge celo-button">
-						<a href="https://app.allbridge.io/bridge?from=SOL&to=CELO&asset=SOL" target="_blank">Bridge Solana</a>
+						<a href="https://app.allbridge.io/bridge?from=SOL&to=CELO&asset=SOL" target="_blank">Bridge SOL</a>
 					</button>
 					<button class="home__info-bridge celo-button">
-						<a href="https://optics.app/" target="_blank">Bridge Eth</a>
+						<a href="https://optics.app/" target="_blank">Bridge ETH</a>
 					</button>
 				</div>
 				<button class="home__info-buy" @click="handleClickBuy" v-else>Buy now</button>
