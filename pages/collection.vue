@@ -7,7 +7,7 @@
     </div>
     <div class="collection__items" v-else>
       <div class="collection__item" :key="index" v-for="(nft, index) in nftList">
-        <img :src="nft.image" alt="item" class="collection__item-image">
+        <img :src="nft.image" alt="item" class="collection__item-image" @click="openFullImage(nft.image)">
         <div class="collection__item-info">
           <h2 class="collection__item-info-name">
             Daopolis #{{ nft.id }}
@@ -21,20 +21,25 @@
     </div>
     <Transfer @closeModal="closeModal" v-if="showTransfer"/>
     <Purchased @closeModal="closeModal" v-if="showPurchased" :openCard="true"/>
+    <ImageModal :image="detailImageSrc" @closeModal="closeModal" v-if="showFullImage"/>
   </section>
 </template>
 <script>
 import Transfer from '@/components/modals/transfer'
 import Purchased from '@/components/modals/purchased'
+import ImageModal from '@/components/modals/imageModal'
 export default {
   data() {
     return {
       showTransfer: false,
-      showPurchased: false
+      showPurchased: false,
+      showFullImage: false,
+      detailImageSrc: null
     }
   },
   computed: {
     nftList() {
+      console.log('00000', this.$store.state.nftList)
       return this.$store.state.nftList
     }
   },
@@ -42,14 +47,21 @@ export default {
     this.$store.dispatch('getCollection')
   },
   methods: {
+    openFullImage(imageSrc) {
+      this.showFullImage = true
+      this.detailImageSrc = imageSrc
+    },
     closeModal(payload) {
       this.showTransfer = payload
       this.showPurchased = payload
+      this.showFullImage = false
+      this.detailImageSrc = null
     }
   },
   components: {
     Transfer,
-    Purchased
+    Purchased,
+    ImageModal
   }
 }
 </script>
@@ -92,6 +104,7 @@ export default {
       width: 28.2rem;
       height: 28.2rem;
       object-fit: cover;
+      cursor: pointer;
     }
     &-info {
       padding: 1.3rem 1.6rem 3.4rem;
