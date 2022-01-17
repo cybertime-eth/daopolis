@@ -39,7 +39,6 @@ export default {
   },
   computed: {
     nftList() {
-      console.log('00000', this.$store.state.nftList)
       return this.$store.state.nftList
     }
   },
