@@ -46,9 +46,6 @@ export default {
     sharingURL() {
       return encodeURIComponent(this.image)
     },
-    isMobile() {
-      return process.browser && window.innerWidth <= 460
-    },
     sharingText() {
       const text = "Just minted NFT on daopolis.city and now I'm #DaopolisCitizen by @cybertime_eth #nftcollection #nftcollectables #nftcollector #nftcommunity #celo $celo #nftdrop"
       return encodeURIComponent(text)
@@ -73,7 +70,7 @@ export default {
       }
     },
     shareImage() {
-      if (!this.isMobile) {
+      if (!this.isMobile()) {
         this.showSharingMenu = !this.showSharingMenu
       }
     },
