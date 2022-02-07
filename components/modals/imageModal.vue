@@ -4,7 +4,7 @@
       <div class="modal__block-image-box">
         <img :src="image" alt="image" class="modal__block-image-image">
         <div class="modal__block-image-buttons">
-          <div class="modal__block-image-dropdown">
+          <!-- <div class="modal__block-image-dropdown">
             <button class="modal__block-image-buttons-button" ref="shareButton" @click="shareImage">
               <img src="/share-image.svg" alt="close">
             </button>
@@ -13,16 +13,16 @@
                 <img src="/socials/twitter-share.svg" alt="twitter">
                 Twitter
               </a>
-              <!-- <a class="modal__block-image-dropdown-menu-item">
+              <a class="modal__block-image-dropdown-menu-item">
                 <img src="/socials/discord-share.svg" alt="discord">
                 Discord
-              </a> -->
+              </a>
               <a class="modal__block-image-dropdown-menu-item" :href="telegramURL" target="_blank">
                 <img src="/socials/telegram-share.svg" alt="telegram">
                 Telegram
               </a>
             </div>
-          </div>
+          </div> -->
           <button class="modal__block-image-buttons-button" @click="downloadImage">
             <img src="/download.svg" alt="close">
           </button>
