@@ -28,6 +28,12 @@
           </button>
         </div>
       </div>
+      <div class="modal__block-image-saved" v-if="imageSaved">
+        <div class="modal__block-image-saved-message">
+          Saved in gallery
+          <img src="/check.svg" alt="check">
+        </div>
+      </div>
       <button class="modal__block-image-close" @click="closeModal">
         <img src="/close-bold.svg" alt="close">
       </button>
@@ -39,7 +45,8 @@ export default {
   props: ['image'],
   data() {
     return {
-      showSharingMenu: false
+      showSharingMenu: false,
+      imageSaved: false
     }
   },
   computed: {
@@ -109,6 +116,10 @@ export default {
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
+      if (this.isMobile()) {
+        this.imageSaved = true
+        setTimeout(() => this.imageSaved = false, 3000)
+      }
     },
     closeModal() {
       this.$emit('closeModal', false)
@@ -125,12 +136,34 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
     background: transparent;
     padding: 0;
     position: relative;
     &-box {
       background: rgba(0, 0, 0, 0.8);
       position: relative;
+    }
+    &-saved {
+      position: relative;
+      &-message {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        left: 50%;
+        top: 7.6rem;
+        transform: translateX(-50%);
+        width: 17.6rem;
+        background: #242225;
+        padding: 8px 0;
+        border-radius: 4px;
+        font-weight: 600;
+        color: #F3F4F6;
+        img {
+          margin-left: 1.2rem;
+        }
+      }
     }
     &-image {
       width: 588px;
