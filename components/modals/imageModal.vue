@@ -1,8 +1,32 @@
 <template>
   <div class="modal">
     <div class="modal__block modal__block-image">
-      <div class="modal__block modal__block-image-box">
+      <div class="modal__block-image-box">
         <img :src="image" alt="image" class="modal__block-image-image">
+        <div class="modal__block-image-buttons">
+          <div class="modal__block-image-dropdown">
+            <button class="modal__block-image-buttons-button" ref="shareButton" @click="shareImage">
+              <img src="/share-image.svg" alt="close">
+            </button>
+            <div class="modal__block-image-dropdown-menu" v-if="showSharingMenu">
+              <a class="modal__block-image-dropdown-menu-item" :href="twitterURL" target="_blank">
+                <img src="/socials/twitter-share.svg" alt="twitter">
+                Twitter
+              </a>
+              <!-- <a class="modal__block-image-dropdown-menu-item">
+                <img src="/socials/discord-share.svg" alt="discord">
+                Discord
+              </a> -->
+              <a class="modal__block-image-dropdown-menu-item" :href="telegramURL" target="_blank">
+                <img src="/socials/telegram-share.svg" alt="telegram">
+                Telegram
+              </a>
+            </div>
+          </div>
+          <button class="modal__block-image-buttons-button" @click="downloadImage">
+            <img src="/download.svg" alt="close">
+          </button>
+        </div>
       </div>
       <button class="modal__block-image-close" @click="closeModal">
         <img src="/close-bold.svg" alt="close">
@@ -13,7 +37,59 @@
 <script>
 export default {
   props: ['image'],
+  data() {
+    return {
+      showSharingMenu: false
+    }
+  },
+  computed: {
+    sharingURL() {
+      return encodeURIComponent(this.image)
+    },
+    isMobile() {
+      return process.browser && window.innerWidth <= 460
+    },
+    sharingText() {
+      const text = "Just minted NFT on daopolis.city and now I'm #DaopolisCitizen by @cybertime_eth #nftcollection #nftcollectables #nftcollector #nftcommunity #celo $celo #nftdrop"
+      return encodeURIComponent(text)
+    },
+    twitterURL() {
+      return `http://twitter.com/share?url='${this.sharingURL}'&text='${this.sharingText}'`
+    },
+    telegramURL() {
+      return `https://t.me/share?url='${this.sharingURL}'&text='${this.sharingText}'`
+    }
+  },
+  beforeMount() {
+    window.addEventListener('click', this.handleClickWindow)
+  },
+  beforeDestroy() {
+    window.removeEventListener('click', this.handleClickWindow)
+  },
   methods: {
+    handleClickWindow(e) {
+      if (this.$refs.shareButton && !this.$refs.shareButton.contains(e.target)) {
+        this.showSharingMenu = false
+      }
+    },
+    shareImage() {
+      if (!this.isMobile) {
+        this.showSharingMenu = !this.showSharingMenu
+      }
+    },
+    async downloadImage() {
+      const imageData = await fetch(this.image)
+      const imageBlog = await imageData.blob()
+      const imageURL = URL.createObjectURL(imageBlog)
+      const index = this.image.lastIndexOf("/") + 1
+      const filename = this.image.substr(index)
+      const link = document.createElement('a')
+      link.href = imageURL
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    },
     closeModal() {
       this.$emit('closeModal', false)
     }
@@ -34,11 +110,47 @@ export default {
     position: relative;
     &-box {
       background: rgba(0, 0, 0, 0.8);
-      padding: 0;
-      margin: 0;
+      position: relative;
     }
     &-image {
       width: 588px;
+    }
+    &-buttons {
+      display: flex;
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      &-button {
+        width: 32px;
+        height: 32px;
+        padding: 2px;
+        background: rgba(218, 221, 225, 0.73);
+        border-radius: 4px;
+        border-color: transparent;
+      }
+    }
+    &-dropdown {
+      position: relative;
+      margin-right: 16px;
+      &-menu {
+        width: 230px;
+        background: #252326;
+        box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.1);
+        border-radius: 4px;
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        &-item {
+          display: flex;
+          align-items: center;
+          padding: 20px 10px;
+          font-size: 16px;
+          cursor: pointer;
+          img {
+            margin-right: 15px;
+          }
+        }
+      }
     }
     &-close {
       position: absolute;

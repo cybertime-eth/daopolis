@@ -34,6 +34,7 @@ export default {
       showTransfer: false,
       showPurchased: false,
       showFullImage: false,
+      detailNftName: '',
       detailImageSrc: null
     }
   },
