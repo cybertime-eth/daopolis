@@ -69,15 +69,38 @@ export default {
         this.showSharingMenu = false
       }
     },
-    shareImage() {
+    async shareImage() {
       if (!this.isMobile()) {
         this.showSharingMenu = !this.showSharingMenu
+      } else {
+        if (!navigator) return
+        const imageData = await fetch(this.image)
+        const blob = await imageData.blob()
+        const index = this.image.lastIndexOf("/") + 1
+        const filename = this.image.substr(index)
+        const files = [new File([blob], filename, { type: blob.type })]
+        const shareData = {
+          text: "Just minted NFT on daopolis.city and now I'm #DaopolisCitizen by @cybertime_eth #nftcollection #nftcollectables #nftcollector #nftcommunity #celo $celo #nftdrop",
+          title: this.image,
+          files,
+        }
+        if (navigator.canShare(shareData)) {
+          try {
+            await navigator.share(shareData)
+          } catch (err) {
+            if (err.name !== 'AbortError') {
+              console.error(err.name, err.message)
+            }
+          }
+        } else {
+          console.log('Sharing not supported', shareData)
+        }
       }
     },
     async downloadImage() {
       const imageData = await fetch(this.image)
-      const imageBlog = await imageData.blob()
-      const imageURL = URL.createObjectURL(imageBlog)
+      const imageBlob = await imageData.blob()
+      const imageURL = URL.createObjectURL(imageBlob)
       const index = this.image.lastIndexOf("/") + 1
       const filename = this.image.substr(index)
       const link = document.createElement('a')
@@ -170,9 +193,14 @@ export default {
       padding: 0 !important;
       &-box {
         margin: 0 !important;
+        padding: 0 8px;
       }
       &-image {
         width: 100%;
+      }
+      &-buttons {
+        top: auto;
+        bottom: 8px;
       }
     }
   }
