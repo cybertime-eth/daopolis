@@ -1,5 +1,5 @@
 import Web3 from 'web3'
-import { ethers, Wallet, providers } from 'ethers'
+import { ethers, BigNumber } from 'ethers'
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import daosABI from '../abi/daos.json'
 import { WHITELIST_ADDRESSES } from '@/constants'
@@ -8,11 +8,14 @@ export const state = () => ({
   daosContract: '0x34d63dc2f8c5655bA6E05124B3D4a283A402CEd9',
   fullAddress: null,
   address: null,
-  userInWhitelist: false,
+  chainId: null,
+  wrongNetwork: false,
+  saleOpened: false,
   mintCount: 5,
   celoPrice: 2,
   totalMintCount: 0,
   rejectBuyNft: false,
+  successAddedNetwork: false,
   successPurchasedNft: false,
   nftList: []
 })
@@ -32,9 +35,17 @@ export const actions = {
   async updateUser({state, getters, commit, dispatch}) {
     if (localStorage.getItem('address') && !localStorage.getItem('walletconnect')) {
       try {
-        const signer = await getters.provider.getSigner()
+        const provider = getters.provider
+        const signer = await provider.getSigner()
         const address = await signer.getAddress()
+        const chain = await provider.getNetwork()
+        window.ethereum.on("chainChanged", async (chainId) => {
+          dispatch('updateChainId', BigNumber.from(chainId).toNumber())
+          dispatch('updateTotalMintCount')
+        })
+
         commit('setAddress', address)
+        dispatch('updateChainId', chain.chainId)
         if (state.totalMintCount === 0) {
           dispatch('updateTotalMintCount')
         }
@@ -46,8 +57,13 @@ export const actions = {
       }
     }
   },
+  updateChainId({commit, state}, chainId) {
+    commit('setChainId', chainId)
+    commit('setWrongNetwork', (chainId !== 42220))
+    commit('setSuccessAddedNetwork', false)
+  },
   async updateTotalMintCount({commit, state, getters}) {
-    if (!state.fullAddress) return
+    if (!state.fullAddress || state.chainId !== 42220) return
     const web3 = new Web3(window.ethereum)
     const kit = ContractKit.newKitFromWeb3(web3)
     const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
@@ -58,8 +74,11 @@ export const actions = {
     try {
       if (window.ethereum) {
         await window.ethereum.request({ method: 'eth_requestAccounts' })
-        const address = await getters.provider.getSigner().getAddress();
+        const provider = getters.provider
+        const address = await provider.getSigner().getAddress();
+        const chain = await provider.getNetwork()
         commit('setAddress', address)
+        dispatch('updateChainId', chain.chainId)
         dispatch('updateTotalMintCount')
       } else {
         alert("please use web3 enabled browser.");
@@ -84,6 +103,45 @@ export const actions = {
       await provider.enable();
     }
     window.web3 = new Web3(provider);
+  },
+  async addCeloNetwork({commit, state}) {
+    try {
+      await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{"chainId": '0xa4ec'}] })
+      commit('setSuccessAddedNetwork', true)
+    } catch(e) {
+      try {
+        if (e.code === 4902) {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              "chainId": "0xa4ec",
+              "chainName": "Celo (Mainnet)",
+              "rpcUrls": [
+                "https://forno.celo.org"
+              ],
+              "nativeCurrency": {
+                "name": "Celo",
+                "symbol": "CELO",
+                "decimals": 18
+              },
+              "blockExplorerUrls": [
+                "https://explorer.celo.org"
+              ]
+          }]})
+          commit('setSuccessAddedNetwork', true)
+        } else {
+          console.log(e)
+        }
+      } catch(e) {
+        console.log(e)
+      }
+    }
+  },
+  async getBalance({state}) {
+    const web3 = new Web3(window.ethereum)
+    const kit = ContractKit.newKitFromWeb3(web3)
+    const res = await kit.getTotalBalance(state.fullAddress)
+    return res.CELO.c[0] / 10000
   },
   async getCollection({commit, state}, fetchMints = false) {
     if (state.fullAddress) {
@@ -123,7 +181,8 @@ export const actions = {
       const msgValue = state.totalMintCount < 2000 ? '0' : web3.utils.toWei((state.celoPrice * state.mintCount).toString())
       const result = await contract.methods.mint(state.fullAddress, state.mintCount).send({
         from: account,
-        value: msgValue
+        value: msgValue,
+        gasPrice: ethers.utils.parseUnits('0.5', 'gwei')
       })
       console.log('mint done')
 
@@ -158,8 +217,17 @@ export const mutations = {
       .join("");
     state.fullAddress = address
     if (WHITELIST_ADDRESSES.includes(address)) {
-      state.userInWhitelist = true
+      state.saleOpened = true
     }
+  },
+  setChainId(state, chainId) {
+    state.chainId = chainId
+  },
+  setWrongNetwork(state, wrongNetwork) {
+    state.wrongNetwork = wrongNetwork
+  },
+  setSaleOpened(state, saleOpened) {
+    state.saleOpened = saleOpened
   },
   setTotalMintCount(state, totalCount) {
     state.totalMintCount = totalCount
@@ -169,6 +237,9 @@ export const mutations = {
   },
   setCeloPrice(state, price) {
     state.celoPrice = price
+  },
+  setSuccessAddedNetwork(state, successAddedNetwork) {
+    state.successAddedNetwork = successAddedNetwork
   },
   setRejectBuyNft(state, rejectBuyNft) {
     state.rejectBuyNft = rejectBuyNft

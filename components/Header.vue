@@ -8,7 +8,11 @@
       </div>
     </nuxt-link>
 	  <div class="header__buttons">
-		<nuxt-link to="/collection"  v-if="address && !openSaleUser">
+    <div class="header__error-network" v-if="showWrongNetwork">
+      <img src="/pulse.svg" alt="pulse">
+      <p class="header__error-network-text">You are on the wrong network</p>
+    </div>
+		<nuxt-link to="/collection"  v-if="!showWrongNetwork && address && saleOpened">
 		  <button class="header__box">
 			My collection
 		  </button>
@@ -46,11 +50,14 @@ export default {
 	profileMenuMobile
   },
   computed: {
-    openSaleUser() {
-      return !this.$store.state.userInWhitelist
+    saleOpened() {
+      return this.$store.state.saleOpened
     },
     address() {
       return this.$store.state.address
+    },
+    showWrongNetwork() {
+      return this.$store.state.wrongNetwork
     },
     logoImage() {
       if (!this.isMobilePlatform) {
@@ -93,6 +100,7 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
 
   &.fixed {
 	position: fixed;
@@ -127,6 +135,25 @@ header {
 	display: flex;
 	align-items: center;
   }
+  &__error {
+    &-network {
+      padding: 1.2rem .8rem;
+      background: $pink;
+      display: flex;
+      align-items: center;
+      border-radius: .8rem;
+      justify-self: flex-end;
+      margin-right: 2.25rem;
+      img {
+        width: 1.35rem;
+      }
+      &-text {
+        color: $white;
+        padding-left: .8rem;
+        font-size: 1.08rem;
+      }
+    }
+  }
   &__box {
 	margin-right: 30px;
   }
@@ -156,6 +183,14 @@ header {
     }
     &__logo-img {
       width: 2rem;
+    }
+    &__error-network {
+      position: absolute;
+      right: 1.3rem;
+      top: 9.3rem;
+      &-text {
+        font-size: 1.2rem;
+      }
     }
     &__box, &__wallet {
       width: auto;

@@ -6,7 +6,7 @@
       <a href="https://t.me/cybertime_eth" target="_blank" class="menu-mobile-list-link">Telegram</a>
       <a href="https://github.com/cybertime-eth" target="_blank" class="menu-mobile-list-link">Github</a>
       <a href="https://discord.gg/cKcWfCux4s" target="_blank" class="menu-mobile-list-link">Discord</a>
-      <a @click="logout" class="menu-mobile-list-link">Logout</a>
+      <a @click="logout" class="menu-mobile-list-link logout">Logout</a>
     </div>
   </div>
 </template>
@@ -41,6 +41,9 @@ export default {
       padding-bottom: 2.5rem;
       font-weight: 600;
       font-size: 1.6rem;
+      &.logout {
+        color: $pink;
+      }
     }
   }
 }
