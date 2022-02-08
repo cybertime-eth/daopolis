@@ -181,7 +181,8 @@ export const actions = {
       const msgValue = state.totalMintCount < 2000 ? '0' : web3.utils.toWei((state.celoPrice * state.mintCount).toString())
       const result = await contract.methods.mint(state.fullAddress, state.mintCount).send({
         from: account,
-        value: msgValue
+        value: msgValue,
+        gasPrice: ethers.utils.parseUnits('0.5', 'gwei')
       })
       console.log('mint done')
 
