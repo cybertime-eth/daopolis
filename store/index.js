@@ -59,11 +59,12 @@ export const actions = {
   },
   updateChainId({commit, state}, chainId) {
     commit('setChainId', chainId)
-    commit('setWrongNetwork', (chainId !== 42220))
+    // commit('setWrongNetwork', (chainId !== 42220))
     commit('setSuccessAddedNetwork', false)
   },
   async updateTotalMintCount({commit, state, getters}) {
-    if (!state.fullAddress || state.chainId !== 42220) return
+    // if (!state.fullAddress || state.chainId !== 42220) return
+    if (!state.fullAddress) return
     const web3 = new Web3(window.ethereum)
     const kit = ContractKit.newKitFromWeb3(web3)
     const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
