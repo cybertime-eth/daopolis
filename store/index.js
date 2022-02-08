@@ -94,8 +94,11 @@ export const actions = {
         44787: "https://alfajores-forno.celo-testnet.org"
       },
       qrcodeModalOptions: {
-        mobileLinks: ['metamask', 'trust', 'safepal', 'math']
+        mobileLinks: ['metamask']
       },
+      // qrcodeModalOptions: {
+      //   mobileLinks: ['metamask', 'trust', 'safepal', 'math']
+      // },
     });
     provider.on("accountsChanged", (accounts) => {
       commit('setAddress', accounts[0])
