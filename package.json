@@ -20,7 +20,10 @@
     "nuxt": "^2.15.7",
     "vue-carousel": "^0.18.0",
     "web3": "^1.6.0",
-    "follow-redirects": ">=1.14.7"
+    "follow-redirects": ">=1.14.7",
+    "glob-parent": ">=5.1.2",
+    "node-fetch": ">=2.6.7",
+    "simple-get": ">=2.8.2"
   },
   "devDependencies": {
     "sass": "^1.42.1",
