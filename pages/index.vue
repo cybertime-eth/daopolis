@@ -1,7 +1,7 @@
 <template>
   <section id="home">
     <div class="home container-xl" :class="{'wrong-network': wrongNetwork}">
-      <video src="/daopolis-movie.MP4" class="home__image" autoplay muted loop></video>
+      <video src="/daopolis-movie.MP4" class="home__image" autoplay muted loop playsinline></video>
       <div class="home__info">
         <h1 class="home__info-name">Meet Daopolis Citizens</h1>
         <h3 class="home__info-description">Automatically generated 9192 NFT's. Born in the CyberTime era, Daopolis citizens will be the foundation of a new gaming metaverse on Celo. Find your digital avatar, gain access to a private club and participate in unique NFT games!</h3>
