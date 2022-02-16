@@ -17,28 +17,39 @@ export const state = () => ({
   rejectBuyNft: false,
   successAddedNetwork: false,
   successPurchasedNft: false,
-  nftList: []
+  nftList: [],
 })
+let web3Provider = null
 
 export const getters = {
-  provider() {
-    const web3 = window.web3 && window.web3.eth && window.web3.eth.currentProvider.connected ? window.web3.eth : window.ethereum
-    if (web3) {
-      return new ethers.providers.Web3Provider(web3);
-    } else {
-      return new Web3.providers.HttpProvider('https://alfajores-forno.celo-testnet.org')
-    }
+  walletConnectProvider() {
+    return new WalletConnectProvider({
+      rpc: {
+        44787: "https://alfajores-forno.celo-testnet.org",
+      },
+      qrcodeModalOptions: {
+        mobileLinks: ['metamask']
+      },
+      // qrcodeModalOptions: {
+      //   mobileLinks: ['metamask', 'trust', 'safepal', 'math']
+      // },
+    })
+  },
+  provider(state, getters) {
+    return window.ethereum || getters.walletConnectProvider
   }
 }
 
 export const actions = {
   async updateUser({state, getters, commit, dispatch}) {
+    if (!getters.provider) return
     if (localStorage.getItem('address') && !localStorage.getItem('walletconnect')) {
       try {
         const provider = getters.provider
-        const signer = await provider.getSigner()
+        const web3Provider = new ethers.providers.Web3Provider(provider)
+        const signer = await web3Provider.getSigner()
         const address = await signer.getAddress()
-        const chain = await provider.getNetwork()
+        const chain = await web3Provider.getNetwork()
         window.ethereum.on("chainChanged", async (chainId) => {
           dispatch('updateChainId', BigNumber.from(chainId).toNumber())
           dispatch('updateTotalMintCount')
@@ -53,6 +64,7 @@ export const actions = {
           dispatch('getCollection')
         }
       } catch(e) {
+        console.log(e)
         localStorage.removeItem('address')
       }
     }
@@ -64,8 +76,8 @@ export const actions = {
   },
   async updateTotalMintCount({commit, state, getters}) {
     // if (!state.fullAddress || state.chainId !== 42220) return
-    if (!state.fullAddress) return
-    const web3 = new Web3(window.ethereum)
+    if (!state.fullAddress || !getters.provider) return
+    const web3 = new Web3(getters.provider)
     const kit = ContractKit.newKitFromWeb3(web3)
     const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
     const totalSupply = await contract.methods.totalSupply().call()
@@ -75,7 +87,7 @@ export const actions = {
     try {
       if (window.ethereum) {
         await window.ethereum.request({ method: 'eth_requestAccounts' })
-        const provider = getters.provider
+        const provider = new ethers.providers.Web3Provider(window.ethereum)
         const address = await provider.getSigner().getAddress();
         const chain = await provider.getNetwork()
         commit('setAddress', address)
@@ -88,20 +100,13 @@ export const actions = {
       throw new Error(error);
     }
   },
-  async walletConnect({commit}, isConnect) {
-    const provider = new WalletConnectProvider({
-      rpc: {
-        44787: "https://alfajores-forno.celo-testnet.org"
-      },
-      qrcodeModalOptions: {
-        mobileLinks: ['metamask']
-      },
-      // qrcodeModalOptions: {
-      //   mobileLinks: ['metamask', 'trust', 'safepal', 'math']
-      // },
-    });
-    provider.on("accountsChanged", (accounts) => {
+  async walletConnect({commit, dispatch, getters}, isConnect) {
+    const provider = getters.walletConnectProvider
+    provider.on("accountsChanged", async (accounts) => {
       commit('setAddress', accounts[0])
+      dispatch('getBalance')
+      dispatch('updateTotalMintCount')
+      const web3 = new Web3(provider)
     });
     if (localStorage.getItem('walletconnect') || isConnect) {
       await provider.enable();
@@ -141,8 +146,9 @@ export const actions = {
       }
     }
   },
-  async getBalance({state}) {
-    const web3 = new Web3(window.ethereum)
+  async getBalance({state, getters}) {
+    if (!getters.provider) return
+    const web3 = new Web3(getters.provider)
     const kit = ContractKit.newKitFromWeb3(web3)
     const res = await kit.getTotalBalance(state.fullAddress)
     return res.CELO.c[0] / 10000
@@ -177,7 +183,9 @@ export const actions = {
   },
   async buyNft({commit, getters, state, dispatch}) {
     try {
-      const web3 = new Web3(window.ethereum)
+      const web3Provider = getters.provider
+      const provider = new ethers.providers.Web3Provider(web3Provider);
+      const web3 = new Web3(web3Provider)
       const accounts = await web3.eth.getAccounts()
       const account = accounts[0]
       const kit = ContractKit.newKitFromWeb3(web3)
@@ -190,12 +198,13 @@ export const actions = {
       })
       console.log('mint done')
 
-      getters.provider.once(result, async () => {
+      provider.once(result, async () => {
         await dispatch('getCollection', true)
         commit('setSuccessPurchasedNft', true)
-      })
+      }) 
     } catch(e) {
       commit('setRejectBuyNft', true)
+      console.log(e)
     }
   },
   async logout({commit}) {

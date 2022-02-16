@@ -209,6 +209,9 @@ export default {
         this.$store.commit('setSaleOpened', true)
       }
 	}
+		if (this.balance === 0) {
+			this.updateBalance()
+		}
   },
   methods: {
 	async updateBalance() {
