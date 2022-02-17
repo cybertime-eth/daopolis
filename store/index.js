@@ -166,10 +166,13 @@ export const actions = {
         if (!provider) {
           provider = new Web3.providers.HttpProvider('https://alfajores-forno.celo-testnet.org')
         }
+        alert('provider created!')
         const web3 = new Web3(provider)
         const kit = ContractKit.newKitFromWeb3(web3)
         const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
+        alert('contract created!')
         const result = await contract.methods.tokensOfOwner(state.fullAddress).call()
+        alert(JSON.stringify(result))
         if (result)  {
           const promises = []
           const nftPromises = []
