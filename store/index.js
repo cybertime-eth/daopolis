@@ -4,6 +4,7 @@ import WalletConnectProvider from "@walletconnect/web3-provider";
 import daosABI from '../abi/daos.json'
 import { WHITELIST_ADDRESSES } from '@/constants'
 const ContractKit = require('@celo/contractkit')
+const axios = require('axios')
 export const state = () => ({
   daosContract: '0x34d63dc2f8c5655bA6E05124B3D4a283A402CEd9',
   fullAddress: null,
@@ -173,12 +174,12 @@ export const actions = {
           const nftList = []
           const fetchCount = fetchMints ? state.mintCount : result.length
           const orderedResult = [...result].sort((a, b) => parseInt(a) - parseInt(b))
-          alert(JSON.stringify(orderedResult))
           orderedResult.slice(-fetchCount).forEach(tokenId => promises.push(contract.methods.tokenURI(tokenId).call()))
           const uriList = await Promise.all(promises)
           alert(JSON.stringify(uriList))
 
-          uriList.forEach(tokenURI => nftPromises.push(this.$axios.get(tokenURI)))
+          // uriList.forEach(tokenURI => nftPromises.push(this.$axios.get(tokenURI)))
+          uriList.forEach(tokenURI => nftPromises.push(axios.get(tokenURI)))
           const nftResultList = await Promise.all(nftPromises)
           alert(JSON.stringify(nftResultList))
 
