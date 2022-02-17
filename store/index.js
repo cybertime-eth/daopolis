@@ -201,7 +201,8 @@ export const actions = {
       const result = await contract.methods.mint(state.fullAddress, state.mintCount).send({
         from: account,
         value: msgValue,
-        gasPrice: ethers.utils.parseUnits('0.5', 'gwei')
+        gasPrice: ethers.utils.parseUnits('0.5', 'gwei'),
+        gasLimit: 21000
       })
       console.log('mint done')
 
