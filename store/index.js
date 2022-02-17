@@ -159,40 +159,32 @@ export const actions = {
   },
   async getCollection({commit, state}, fetchMints = false) {
     if (state.fullAddress) {
-      try {
-        let provider = window.ethereum
-        if (!provider) {
-          provider = new Web3.providers.HttpProvider('https://alfajores-forno.celo-testnet.org')
-        }
-        const web3 = new Web3(provider)
-        const kit = ContractKit.newKitFromWeb3(web3)
-        const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
-        const result = await contract.methods.tokensOfOwner(state.fullAddress).call()
-        if (result)  {
-          const promises = []
-          const nftPromises = []
-          const nftList = []
-          const fetchCount = fetchMints ? state.mintCount : result.length
-          const orderedResult = [...result].sort((a, b) => parseInt(a) - parseInt(b))
-          orderedResult.slice(-fetchCount).forEach(tokenId => promises.push(contract.methods.tokenURI(tokenId).call()))
-          const uriList = await Promise.all(promises)
-          alert(JSON.stringify(uriList))
+      let provider = window.ethereum
+      if (!provider) {
+        provider = new Web3.providers.HttpProvider('https://alfajores-forno.celo-testnet.org')
+      }
+      const web3 = new Web3(provider)
+      const kit = ContractKit.newKitFromWeb3(web3)
+      const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
+      const result = await contract.methods.tokensOfOwner(state.fullAddress).call()
+      if (result)  {
+        const promises = []
+        const nftPromises = []
+        const nftList = []
+        const fetchCount = fetchMints ? state.mintCount : result.length
+        const orderedResult = [...result].sort((a, b) => parseInt(a) - parseInt(b))
+        orderedResult.slice(-fetchCount).forEach(tokenId => promises.push(contract.methods.tokenURI(tokenId).call()))
+        const uriList = await Promise.all(promises)
+        uriList.forEach(tokenURI => nftPromises.push(axios.get(tokenURI)))
+        const nftResultList = await Promise.all(nftPromises)
 
-          // uriList.forEach(tokenURI => nftPromises.push(this.$axios.get(tokenURI)))
-          uriList.forEach(tokenURI => nftPromises.push(axios.get(tokenURI)))
-          const nftResultList = await Promise.all(nftPromises)
-          alert(JSON.stringify(nftResultList))
-
-          nftResultList.forEach(nftResult => {
-            nftList.push({
-              id: parseInt(nftResult.data.token_id),
-              ...nftResult.data
-            })
+        nftResultList.forEach(nftResult => {
+          nftList.push({
+            id: parseInt(nftResult.data.token_id),
+            ...nftResult.data
           })
-          commit('setNftList', nftList)
-        }
-      } catch(e) {
-        alert(e)
+        })
+        commit('setNftList', nftList)
       }
     }
   },
