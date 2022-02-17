@@ -18,7 +18,7 @@
           <img src="/auth/trastwallet.svg" alt="metamask" class="modal__connect-button-image">
         </button> -->
       </div>
-			<img src="/auth/metamask-mobile.svg" alt="metamask" class="modal__connect-image mobile" v-if="!metamaskEnabled">
+			<!-- <img src="/auth/metamask-mobile.svg" alt="metamask" class="modal__connect-image mobile" v-if="!metamaskEnabled"> -->
     </div>
   </div>
 </template>

@@ -28,7 +28,7 @@ export const getters = {
         44787: "https://alfajores-forno.celo-testnet.org",
       },
       qrcodeModalOptions: {
-        mobileLinks: ['metamask']
+        mobileLinks: !window.ethereum ? ['metamask'] : []
       },
       // qrcodeModalOptions: {
       //   mobileLinks: ['metamask', 'trust', 'safepal', 'math']
@@ -50,7 +50,7 @@ export const actions = {
         const signer = await web3Provider.getSigner()
         const address = await signer.getAddress()
         const chain = await web3Provider.getNetwork()
-        window.ethereum.on("chainChanged", async (chainId) => {
+        provider.on("chainChanged", async (chainId) => {
           dispatch('updateChainId', BigNumber.from(chainId).toNumber())
           dispatch('updateTotalMintCount')
         })
@@ -106,6 +106,9 @@ export const actions = {
       commit('setAddress', accounts[0])
       dispatch('getBalance')
       dispatch('updateTotalMintCount')
+      if ($nuxt.$route.name === 'collection') {
+        dispatch('getCollection')
+      }
       const web3 = new Web3(provider)
     });
     if (localStorage.getItem('walletconnect') || isConnect) {
@@ -155,7 +158,11 @@ export const actions = {
   },
   async getCollection({commit, state}, fetchMints = false) {
     if (state.fullAddress) {
-      const web3 = new Web3(window.ethereum)
+      let provider = window.ethereum
+      if (!provider) {
+        provider = new Web3.providers.HttpProvider('https://alfajores-forno.celo-testnet.org')
+      }
+      const web3 = new Web3(provider)
       const kit = ContractKit.newKitFromWeb3(web3)
       const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
       const result = await contract.methods.tokensOfOwner(state.fullAddress).call()
