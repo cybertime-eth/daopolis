@@ -202,7 +202,7 @@ export const actions = {
         from: account,
         value: msgValue,
         gasPrice: ethers.utils.parseUnits('0.5', 'gwei'),
-        gasLimit: 21000
+        gasLimit: 210000
       })
       console.log('mint done')
 
