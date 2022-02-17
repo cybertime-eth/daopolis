@@ -160,30 +160,27 @@ export const actions = {
     if (state.fullAddress) {
       try {
         let provider = window.ethereum
-        if (provider) {
-          alert('ethereum exists')
-        }
         if (!provider) {
           provider = new Web3.providers.HttpProvider('https://alfajores-forno.celo-testnet.org')
         }
-        alert('provider created!')
         const web3 = new Web3(provider)
         const kit = ContractKit.newKitFromWeb3(web3)
         const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
-        alert('contract created!')
         const result = await contract.methods.tokensOfOwner(state.fullAddress).call()
-        alert(JSON.stringify(result))
         if (result)  {
           const promises = []
           const nftPromises = []
           const nftList = []
           const fetchCount = fetchMints ? state.mintCount : result.length
           const orderedResult = [...result].sort((a, b) => parseInt(a) - parseInt(b))
+          alert(JSON.stringify(orderedResult))
           orderedResult.slice(-fetchCount).forEach(tokenId => promises.push(contract.methods.tokenURI(tokenId).call()))
           const uriList = await Promise.all(promises)
+          alert(JSON.stringify(uriList))
 
           uriList.forEach(tokenURI => nftPromises.push(this.$axios.get(tokenURI)))
           const nftResultList = await Promise.all(nftPromises)
+          alert(JSON.stringify(nftResultList))
 
           nftResultList.forEach(nftResult => {
             nftList.push({
