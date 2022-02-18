@@ -55,7 +55,7 @@ export const actions = {
         const chain = await web3Provider.getNetwork()
         provider.on("chainChanged", async (chainId) => {
           dispatch('updateChainId', BigNumber.from(chainId).toNumber())
-          if (state.totalMintCount === 0 & chainId !== state.chaindId) {
+          if (chainId !== state.chaindId) {
             dispatch('updateTotalMintCount')
           }
         })
@@ -82,17 +82,11 @@ export const actions = {
   async updateTotalMintCount({commit, state, getters}) {
     // if (!state.fullAddress || state.chainId !== 42220) return
     if (!state.fullAddress || !getters.provider) return
-    try {
-      const web3 = new Web3(getters.provider)
-      const kit = ContractKit.newKitFromWeb3(web3)
-      const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
-      alert('web3 created!')
-      const totalSupply = await contract.methods.totalSupply().call()
-      alert(totalSupply)
-      commit('setTotalMintCount', totalSupply)
-    } catch(e) {
-      alert(e)
-    }
+    const web3 = new Web3(getters.provider)
+    const kit = ContractKit.newKitFromWeb3(web3)
+    const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
+    const totalSupply = await contract.methods.totalSupply().call()
+    commit('setTotalMintCount', totalSupply)
   },
   async connectMetaTrust({getters, commit, dispatch}) {
     try {
@@ -123,7 +117,7 @@ export const actions = {
 
     provider.on("chainChanged", async (chainId) => {
       dispatch('updateChainId', BigNumber.from(chainId).toNumber())
-      if (state.totalMintCount === 0 & chainId !== state.chainId) {
+      if (chainId !== state.chainId) {
         dispatch('updateTotalMintCount')
       }
     })
