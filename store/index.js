@@ -1,6 +1,7 @@
 import Web3 from 'web3'
 import { ethers, BigNumber } from 'ethers'
 import WalletConnectProvider from "@walletconnect/web3-provider";
+import { uuid } from "@walletconnect/utils";
 import daosABI from '../abi/daos.json'
 import { WHITELIST_ADDRESSES } from '@/constants'
 const ContractKit = require('@celo/contractkit')
@@ -10,6 +11,7 @@ export const state = () => ({
   fullAddress: null,
   address: null,
   chainId: null,
+  bridgeUri: null,
   wrongNetwork: false,
   saleOpened: false,
   mintCount: 5,
@@ -20,16 +22,16 @@ export const state = () => ({
   successPurchasedNft: false,
   nftList: [],
 })
-let web3Provider = null
 
 export const getters = {
   walletConnectProvider() {
     return new WalletConnectProvider({
       rpc: {
+        42220: "https://forno.celo.org",
         44787: "https://alfajores-forno.celo-testnet.org",
       },
       qrcodeModalOptions: {
-        mobileLinks: !window.ethereum ? ['metamask'] : []
+        mobileLinks: !window.ethereum ? ['metamask', 'valora'] : []
       },
       // qrcodeModalOptions: {
       //   mobileLinks: ['metamask', 'trust', 'safepal', 'math']
@@ -101,8 +103,7 @@ export const actions = {
       throw new Error(error);
     }
   },
-  async walletConnect({commit, dispatch, getters}, isConnect) {
-    const provider = getters.walletConnectProvider
+  addEventHandlerForWalletProvider({commit, dispatch}, provider) {
     provider.on("accountsChanged", async (accounts) => {
       commit('setAddress', accounts[0])
       dispatch('getBalance')
@@ -110,14 +111,53 @@ export const actions = {
       if ($nuxt.$route.name === 'collection') {
         dispatch('getCollection')
       }
-      const web3 = new Web3(provider)
     });
+
+    provider.on("chainChanged", async (chainId) => {
+      dispatch('updateChainId', BigNumber.from(chainId).toNumber())
+      dispatch('updateTotalMintCount')
+    })
+  },
+  async valoraConnect({state, getters, commit, dispatch}) {
+    const provider = getters.walletConnectProvider
+    const wc = provider.wc
+    dispatch('addEventHandlerForWalletProvider', provider)
+
+    // create session
+    wc._key = await wc._generateKey()
+    const request = wc._formatRequest({
+      method: "wc_sessionRequest",
+      params: [
+        {
+          peerId: wc.clientId,
+          peerMeta: wc.clientMeta,
+          chainId: state.chainId,
+        }
+      ],
+    })
+    wc.handshakeId = request.id
+    wc.handshakeTopic = uuid()
+    wc._sendSessionRequest(request, "Session update rejected", { topic: wc.handshakeTopic })
+    commit('setBridgeUri', wc.uri)
+    // create session end
+
+    provider.start()
+    provider.subscribeWalletConnector()
+  },
+  async walletConnect({commit, dispatch, getters}, isConnect) {
+    const provider = getters.walletConnectProvider
+    dispatch('addEventHandlerForWalletProvider', provider)
+
     if (localStorage.getItem('walletconnect') || isConnect) {
       await provider.enable();
     }
     window.web3 = new Web3(provider);
   },
   async addCeloNetwork({commit, state}) {
+    if (!window.ethereum) {
+      alert('Please switch network manaully')
+      return
+    }
     try {
       await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{"chainId": '0xa4ec'}] })
       commit('setSuccessAddedNetwork', true)
@@ -243,6 +283,9 @@ export const mutations = {
   },
   setChainId(state, chainId) {
     state.chainId = chainId
+  },
+  setBridgeUri(state, uri) {
+    state.bridgeUri = uri
   },
   setWrongNetwork(state, wrongNetwork) {
     state.wrongNetwork = wrongNetwork
