@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "dev": "nuxt --port 5002",
-    "dev:host": "nuxt --hostname  10.70.1.222 --port 5002",
     "build": "nuxt build",
     "start": "nuxt start",
     "generate": "nuxt generate"

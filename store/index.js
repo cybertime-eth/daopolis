@@ -7,7 +7,7 @@ import { WHITELIST_ADDRESSES } from '@/constants'
 const ContractKit = require('@celo/contractkit')
 const axios = require('axios')
 export const state = () => ({
-  daosContract: '0x34d63dc2f8c5655bA6E05124B3D4a283A402CEd9',
+  daosContract: '0xc4ea80deCA2415105746639eC16cB0cF8378996A',
   fullAddress: null,
   address: null,
   chainId: null,
@@ -55,7 +55,7 @@ export const actions = {
         const chain = await web3Provider.getNetwork()
         provider.on("chainChanged", async (chainId) => {
           dispatch('updateChainId', BigNumber.from(chainId).toNumber())
-          if (chainId !== state.chaindId) {
+          if (state.totalMintCount === 0 || chainId !== state.chainId) {
             dispatch('updateTotalMintCount')
           }
         })
@@ -76,17 +76,20 @@ export const actions = {
   },
   updateChainId({commit, state}, chainId) {
     commit('setChainId', chainId)
-    // commit('setWrongNetwork', (chainId !== 42220))
+    commit('setWrongNetwork', (chainId !== 42220))
     commit('setSuccessAddedNetwork', false)
   },
   async updateTotalMintCount({commit, state, getters}) {
-    // if (!state.fullAddress || state.chainId !== 42220) return
-    if (!state.fullAddress || !getters.provider) return
-    const web3 = new Web3(getters.provider)
-    const kit = ContractKit.newKitFromWeb3(web3)
-    const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
-    const totalSupply = await contract.methods.totalSupply().call()
-    commit('setTotalMintCount', totalSupply)
+    if (!state.fullAddress || !getters.provider || state.chainId !== 42220) return
+    try {
+      const web3 = new Web3(getters.provider)
+      const kit = ContractKit.newKitFromWeb3(web3)
+      const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
+      const totalSupply = await contract.methods.totalSupply().call()
+      commit('setTotalMintCount', totalSupply)
+    } catch(e) {
+      console.log(e)
+    }
   },
   async connectMetaTrust({getters, commit, dispatch}) {
     try {
@@ -117,7 +120,7 @@ export const actions = {
 
     provider.on("chainChanged", async (chainId) => {
       dispatch('updateChainId', BigNumber.from(chainId).toNumber())
-      if (chainId !== state.chainId) {
+      if (state.totalMintCount === 0 || chainId !== state.chainId) {
         dispatch('updateTotalMintCount')
       }
     })
@@ -202,7 +205,7 @@ export const actions = {
     }
   },
   async getBalance({state, getters}) {
-    if (!getters.provider) return
+    if (!state.fullAddress || !getters.provider) return
     const web3 = new Web3(getters.provider)
     const kit = ContractKit.newKitFromWeb3(web3)
     const res = await kit.getTotalBalance(state.fullAddress)
@@ -212,7 +215,7 @@ export const actions = {
     if (state.fullAddress) {
       let provider = window.ethereum
       if (!provider) {
-        provider = new Web3.providers.HttpProvider('https://alfajores-forno.celo-testnet.org')
+        provider = new Web3.providers.HttpProvider('https://forno.celo.org')
       }
       const web3 = new Web3(provider)
       const kit = ContractKit.newKitFromWeb3(web3)
