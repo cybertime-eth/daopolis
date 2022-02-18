@@ -55,7 +55,9 @@ export const actions = {
         const chain = await web3Provider.getNetwork()
         provider.on("chainChanged", async (chainId) => {
           dispatch('updateChainId', BigNumber.from(chainId).toNumber())
-          dispatch('updateTotalMintCount')
+          if (state.totalMintCount === 0 & chainId !== state.chaindId) {
+            dispatch('updateTotalMintCount')
+          }
         })
 
         commit('setAddress', address)
@@ -80,13 +82,17 @@ export const actions = {
   async updateTotalMintCount({commit, state, getters}) {
     // if (!state.fullAddress || state.chainId !== 42220) return
     if (!state.fullAddress || !getters.provider) return
-    const web3 = new Web3(getters.provider)
-    const kit = ContractKit.newKitFromWeb3(web3)
-    const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
-    alert('web3 created!')
-    const totalSupply = await contract.methods.totalSupply().call()
-    alert(totalSupply)
-    commit('setTotalMintCount', totalSupply)
+    try {
+      const web3 = new Web3(getters.provider)
+      const kit = ContractKit.newKitFromWeb3(web3)
+      const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
+      alert('web3 created!')
+      const totalSupply = await contract.methods.totalSupply().call()
+      alert(totalSupply)
+      commit('setTotalMintCount', totalSupply)
+    } catch(e) {
+      alert(e)
+    }
   },
   async connectMetaTrust({getters, commit, dispatch}) {
     try {
@@ -105,7 +111,7 @@ export const actions = {
       throw new Error(error);
     }
   },
-  addEventHandlerForWalletProvider({commit, dispatch}, provider) {
+  addEventHandlerForWalletProvider({state, commit, dispatch}, provider) {
     provider.on("accountsChanged", async (accounts) => {
       commit('setAddress', accounts[0])
       dispatch('getBalance')
@@ -117,7 +123,9 @@ export const actions = {
 
     provider.on("chainChanged", async (chainId) => {
       dispatch('updateChainId', BigNumber.from(chainId).toNumber())
-      dispatch('updateTotalMintCount')
+      if (state.totalMintCount === 0 & chainId !== state.chainId) {
+        dispatch('updateTotalMintCount')
+      }
     })
   },
   async valoraConnect({state, getters, commit, dispatch}) {
