@@ -55,7 +55,7 @@ export const actions = {
         const chain = await web3Provider.getNetwork()
         provider.on("chainChanged", async (chainId) => {
           dispatch('updateChainId', BigNumber.from(chainId).toNumber())
-          if (chainId !== state.chaindId) {
+          if (state.totalMintCount === 0 || chainId !== state.chainId) {
             dispatch('updateTotalMintCount')
           }
         })
@@ -117,7 +117,7 @@ export const actions = {
 
     provider.on("chainChanged", async (chainId) => {
       dispatch('updateChainId', BigNumber.from(chainId).toNumber())
-      if (chainId !== state.chainId) {
+      if (state.totalMintCount === 0 || chainId !== state.chainId) {
         dispatch('updateTotalMintCount')
       }
     })
@@ -202,7 +202,7 @@ export const actions = {
     }
   },
   async getBalance({state, getters}) {
-    if (!getters.provider) return
+    if (!state.fullAddress || !getters.provider) return
     const web3 = new Web3(getters.provider)
     const kit = ContractKit.newKitFromWeb3(web3)
     const res = await kit.getTotalBalance(state.fullAddress)
