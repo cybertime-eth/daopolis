@@ -83,7 +83,9 @@ export const actions = {
     const web3 = new Web3(getters.provider)
     const kit = ContractKit.newKitFromWeb3(web3)
     const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
+    alert('web3 created!')
     const totalSupply = await contract.methods.totalSupply().call()
+    alert(totalSupply)
     commit('setTotalMintCount', totalSupply)
   },
   async connectMetaTrust({getters, commit, dispatch}) {
@@ -146,12 +148,19 @@ export const actions = {
   },
   async walletConnect({commit, dispatch, getters}, isConnect) {
     const provider = getters.walletConnectProvider
-    dispatch('addEventHandlerForWalletProvider', provider)
+    try {
+      dispatch('addEventHandlerForWalletProvider', provider)
 
-    if (localStorage.getItem('walletconnect') || isConnect) {
-      await provider.enable();
+      if (localStorage.getItem('walletconnect') || isConnect) {
+        await provider.enable();
+      }
+      window.web3 = new Web3(provider);
+    } catch(e) {
+      console.log(e)
+      await provider.disconnect()
+      provider.wc._handshakeTopic = ""
+      provider.isConnecting = false
     }
-    window.web3 = new Web3(provider);
   },
   async addCeloNetwork({commit, state}) {
     if (!window.ethereum) {
