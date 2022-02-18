@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "nuxt --port 5002",
+    "dev:host": "nuxt --hostname  10.70.1.222 --port 5002",
     "build": "nuxt build",
     "start": "nuxt start",
     "generate": "nuxt generate"
@@ -20,6 +21,7 @@
     "fs": "0.0.1-security",
     "net": "^1.0.2",
     "nuxt": "^2.15.7",
+    "qrcode.vue": "^1.7.0",
     "vue-carousel": "^0.18.0",
     "web3": "^1.6.0"
   },
