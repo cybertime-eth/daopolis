@@ -48,7 +48,7 @@ export default {
     },
     openMetamaskAppFromMobile() {
       if (this.isMobile()) {
-        location.href = `metamask://wallet/wc?uri=${this.walletUri}`
+        location.href = `https://metamask.app.link/wc?uri=${encodeURIComponent(this.walletUri)}`
       }
     },
     connectValora() {
