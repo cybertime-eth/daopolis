@@ -206,9 +206,11 @@ export const actions = {
   },
   async getBalance({state, getters}) {
     if (!state.fullAddress || !getters.provider) return
+    alert('Get balance')
     const web3 = new Web3(getters.provider)
     const kit = ContractKit.newKitFromWeb3(web3)
     const res = await kit.getTotalBalance(state.fullAddress)
+    alert(res)
     return res.CELO.c[0] / 10000
   },
   async getCollection({commit, state}, fetchMints = false) {
@@ -221,6 +223,7 @@ export const actions = {
       const kit = ContractKit.newKitFromWeb3(web3)
       const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
       const result = await contract.methods.tokensOfOwner(state.fullAddress).call()
+      alert(result)
       if (result)  {
         const promises = []
         const nftPromises = []
