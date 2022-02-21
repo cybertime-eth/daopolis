@@ -5,7 +5,7 @@
         <h2 class="modal__title">Valora</h2>
         <h3 class="modal__sub-title">Opening Valora Wallet. If it doesn't open, you can scan this QR code.</h3>
         <img src="/close.svg" alt="close" class="modal__close" @click="closeModal">
-        <QrcodeVue class="modal__qrcode" :value="bridgeUri" size="180" v-if="bridgeUri" />
+        <QrcodeVue class="modal__qrcode" :value="walletUri" size="180" v-if="walletUri" />
       </div>
     </div>
   </div>
@@ -20,8 +20,8 @@ export default {
     address() {
       return this.$store.state.address
     },
-    bridgeUri() {
-      return this.$store.state.bridgeUri
+    walletUri() {
+      return this.$store.state.walletUri
     }
   },
   watch: {
@@ -30,15 +30,15 @@ export default {
         this.closeModal()
       }
     },
-    bridgeUri() {
-      if (this.$store.state.bridgeUri) {
+    walletUri() {
+      if (this.$store.state.walletUri) {
         this.openValoraAppFromMobile()  
       }
     }
   },
   mounted() {
-    if (!this.bridgeUri) {
-      this.$store.dispatch('valoraConnect')
+    if (!this.walletUri) {
+      this.$store.dispatch('createWalletConnect')
     } else {
       this.openValoraAppFromMobile()
     }
@@ -46,7 +46,7 @@ export default {
   methods: {
     openValoraAppFromMobile() {
       if (this.isMobile()) {
-        location.href = `celo://wallet/wc?uri=${this.bridgeUri}`
+        location.href = `celo://wallet/wc?uri=${this.walletUri}`
       }
     },
     closeModal() {

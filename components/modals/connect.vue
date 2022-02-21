@@ -8,7 +8,7 @@
           Valora
           <img src="/auth/valora.svg" alt="valora" class="modal__connect-button-image">
         </button>
-        <button class="modal__connect-button" @click="connectMetaTrust" v-if="metamaskEnabled">
+        <button class="modal__connect-button" @click="connectMetaTrust">
           MetaMask
           <img src="/auth/metamask.svg" alt="metamask" class="modal__connect-button-image">
         </button>
@@ -22,17 +22,34 @@
 </template>
 <script>
 export default {
-	data() {
-		return {
-      metamaskEnabled: false,
-		}
-	},
-	mounted() {
-		this.metamaskEnabled = !!window.ethereum
-	},
+  computed: {
+    walletUri() {
+      return this.$store.state.walletUri
+    }
+  },
+  watch: {
+    walletUri() {
+      if (this.$store.state.walletUri) {
+        this.openMetamaskAppFromMobile()
+      }
+    }
+  },
   methods: {
     async connectMetaTrust() {
-      await this.$store.dispatch('connectMetaTrust')
+      if (!this.isMobile()) {
+        await this.$store.dispatch('connectMetaTrust')
+      } else {
+        if (!this.walletUri) {
+          this.$store.dispatch('createWalletConnect')
+        } else {
+          this.openMetamaskAppFromMobile()
+        }
+      }
+    },
+    openMetamaskAppFromMobile() {
+      if (this.isMobile()) {
+        location.href = `metamask://wallet/wc?uri=${this.walletUri}`
+      }
     },
     connectValora() {
       this.$emit('showValora')

@@ -11,7 +11,7 @@ export const state = () => ({
   fullAddress: null,
   address: null,
   chainId: null,
-  bridgeUri: null,
+  walletUri: null,
   wrongNetwork: false,
   saleOpened: false,
   mintCount: 5,
@@ -125,7 +125,7 @@ export const actions = {
       }
     })
   },
-  async valoraConnect({state, getters, commit, dispatch}) {
+  async createWalletConnect({state, getters, commit, dispatch}) {
     const provider = getters.walletConnectProvider
     const wc = provider.wc
     dispatch('addEventHandlerForWalletProvider', provider)
@@ -145,7 +145,7 @@ export const actions = {
     wc.handshakeId = request.id
     wc.handshakeTopic = uuid()
     wc._sendSessionRequest(request, "Session update rejected", { topic: wc.handshakeTopic })
-    commit('setBridgeUri', wc.uri)
+    commit('setWalletUri', wc.uri)
     // create session end
 
     provider.start()
@@ -298,8 +298,8 @@ export const mutations = {
   setChainId(state, chainId) {
     state.chainId = chainId
   },
-  setBridgeUri(state, uri) {
-    state.bridgeUri = uri
+  setWalletUri(state, uri) {
+    state.walletUri = uri
   },
   setWrongNetwork(state, wrongNetwork) {
     state.wrongNetwork = wrongNetwork
