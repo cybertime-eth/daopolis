@@ -122,6 +122,18 @@ export const actions = {
         dispatch('updateTotalMintCount')
       }
     })
+
+    provider.on("error", () => {
+      dispatch('disconnectWallet', provider)
+    })
+
+    provider.on("disconnect", () => {
+      dispatch('disconnectWallet', provider)
+    })
+  },
+  disconnectWallet({}, provider) {
+    provider.wc._handshakeTopic = ""
+    provider.isConnecting = false
   },
   async createWalletConnect({state, getters, commit, dispatch}) {
     const provider = getters.walletConnectProvider
@@ -160,9 +172,7 @@ export const actions = {
       window.web3 = new Web3(provider);
     } catch(e) {
       console.log(e)
-      await provider.disconnect()
-      provider.wc._handshakeTopic = ""
-      provider.isConnecting = false
+      dispatch('disconnectWallet', provider)
     }
   },
   async addCeloNetwork({commit, state}) {
@@ -204,14 +214,10 @@ export const actions = {
   },
   async getBalance({state, getters}) {
     if (!state.fullAddress || !getters.provider) return
-    try {
-      const web3 = new Web3(getters.provider)
-      const kit = ContractKit.newKitFromWeb3(web3)
-      const res = await kit.getTotalBalance(state.fullAddress)
-      return res.CELO.c[0] / 10000
-    } catch(e) {
-      return 0
-    }
+    const web3 = new Web3(getters.provider)
+    const kit = ContractKit.newKitFromWeb3(web3)
+    const res = await kit.getTotalBalance(state.fullAddress)
+    return res.CELO.c[0] / 10000
   },
   async getCollection({commit, state}, fetchMints = false) {
     if (state.fullAddress) {
