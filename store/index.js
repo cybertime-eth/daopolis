@@ -123,13 +123,13 @@ export const actions = {
       }
     })
 
-    provider.on("error", () => {
-      alert('wallet error')
+    provider.on("stop", () => {
+      alert('wallet stop')
       dispatch('disconnectWallet', provider)
     })
 
-    provider.on("disconnect", () => {
-      alert('wallet disconnnect')
+    provider.on("close", () => {
+      alert('wallet close')
       dispatch('disconnectWallet', provider)
     })
   },
