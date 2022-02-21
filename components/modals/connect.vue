@@ -36,7 +36,7 @@ export default {
   },
   methods: {
     async connectMetaTrust() {
-      if (!this.isMobile()) {
+      if (window.ethereum) {
         await this.$store.dispatch('connectMetaTrust')
       } else {
         if (!this.walletUri) {
