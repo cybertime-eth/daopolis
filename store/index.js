@@ -27,8 +27,7 @@ export const getters = {
   walletConnectProvider() {
     return new WalletConnectProvider({
       rpc: {
-        42220: "https://forno.celo.org",
-        44787: "https://alfajores-forno.celo-testnet.org",
+        42220: "https://forno.celo.org"
       },
       qrcodeModalOptions: {
         mobileLinks: !window.ethereum ? ['metamask', 'valora'] : []
@@ -88,6 +87,7 @@ export const actions = {
       const totalSupply = await contract.methods.totalSupply().call()
       commit('setTotalMintCount', totalSupply)
     } catch(e) {
+      alert(e)
       console.log(e)
     }
   },
@@ -111,7 +111,6 @@ export const actions = {
   addEventHandlerForWalletProvider({state, commit, dispatch}, provider) {
     provider.on("accountsChanged", async (accounts) => {
       commit('setAddress', accounts[0])
-      dispatch('getBalance')
       dispatch('updateTotalMintCount')
       if ($nuxt.$route.name === 'collection') {
         dispatch('getCollection')
@@ -206,12 +205,15 @@ export const actions = {
   },
   async getBalance({state, getters}) {
     if (!state.fullAddress || !getters.provider) return
-    alert('Get balance')
-    const web3 = new Web3(getters.provider)
-    const kit = ContractKit.newKitFromWeb3(web3)
-    const res = await kit.getTotalBalance(state.fullAddress)
-    alert(JSON.stringify(res))
-    return res.CELO.c[0] / 10000
+    try {
+      const web3 = new Web3(getters.provider)
+      const kit = ContractKit.newKitFromWeb3(web3)
+      const res = await kit.getTotalBalance(state.fullAddress)
+      return res.CELO.c[0] / 10000
+    } catch(e) {
+      alert(e)
+      return 0
+    }
   },
   async getCollection({commit, state}, fetchMints = false) {
     if (state.fullAddress) {
