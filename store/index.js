@@ -84,9 +84,7 @@ export const actions = {
       const web3 = new Web3(getters.provider)
       const kit = ContractKit.newKitFromWeb3(web3)
       const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
-      alert(`Update mint count: ${state.fullAddress}, ${window.ethereum === getters.provider}`)
       const totalSupply = await contract.methods.totalSupply().call()
-      alert(totalSupply.toString())
       commit('setTotalMintCount', totalSupply)
     } catch(e) {
       console.log(e)
@@ -209,9 +207,7 @@ export const actions = {
     try {
       const web3 = new Web3(getters.provider)
       const kit = ContractKit.newKitFromWeb3(web3)
-      alert(`Get balance: ${state.fullAddress}`)
       const res = await kit.getTotalBalance(state.fullAddress)
-      alert(JSON.stringify(res))
       return res.CELO.c[0] / 10000
     } catch(e) {
       return 0
@@ -227,7 +223,6 @@ export const actions = {
       const kit = ContractKit.newKitFromWeb3(web3)
       const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
       const result = await contract.methods.tokensOfOwner(state.fullAddress).call()
-      alert(JSON.stringify(result))
       if (result)  {
         const promises = []
         const nftPromises = []
