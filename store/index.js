@@ -80,19 +80,15 @@ export const actions = {
   },
   async updateTotalMintCount({commit, state, getters}) {
     if (!state.fullAddress || !getters.provider || state.chainId !== 42220) return
-    alert('Update mint count')
     try {
       const web3 = new Web3(getters.provider)
-      alert(web3)
       const kit = ContractKit.newKitFromWeb3(web3)
-      alert(kit)
       const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
-      alert(contract)
+      alert(`Update mint count: ${state.fullAddress}`)
       const totalSupply = await contract.methods.totalSupply().call()
       alert(totalSupply.toString())
       commit('setTotalMintCount', totalSupply)
     } catch(e) {
-      alert(e)
       console.log(e)
     }
   },
@@ -211,14 +207,13 @@ export const actions = {
   async getBalance({state, getters}) {
     if (!state.fullAddress || !getters.provider) return
     try {
-      alert('Get balance')
       const web3 = new Web3(getters.provider)
       const kit = ContractKit.newKitFromWeb3(web3)
+      alert(`Get balance: ${state.fullAddress}`)
       const res = await kit.getTotalBalance(state.fullAddress)
       alert(JSON.stringify(res))
       return res.CELO.c[0] / 10000
     } catch(e) {
-      alert(e)
       return 0
     }
   },
