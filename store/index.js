@@ -124,10 +124,12 @@ export const actions = {
     })
 
     provider.on("error", () => {
+      alert('wallet error')
       dispatch('disconnectWallet', provider)
     })
 
     provider.on("disconnect", () => {
+      alert('wallet disconnnect')
       dispatch('disconnectWallet', provider)
     })
   },
