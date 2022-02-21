@@ -83,8 +83,11 @@ export const actions = {
     alert('Update mint count')
     try {
       const web3 = new Web3(getters.provider)
+      alert(web3)
       const kit = ContractKit.newKitFromWeb3(web3)
+      alert(kit)
       const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
+      alert(contract)
       const totalSupply = await contract.methods.totalSupply().call()
       alert(totalSupply.toString())
       commit('setTotalMintCount', totalSupply)
