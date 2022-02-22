@@ -122,16 +122,6 @@ export const actions = {
         dispatch('updateTotalMintCount')
       }
     })
-
-    provider.on("stop", () => {
-      alert('wallet stop')
-      dispatch('disconnectWallet', provider)
-    })
-
-    provider.on("close", () => {
-      alert('wallet close')
-      dispatch('disconnectWallet', provider)
-    })
   },
   disconnectWallet({}, provider) {
     provider.wc._handshakeTopic = ""
