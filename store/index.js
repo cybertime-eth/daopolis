@@ -123,9 +123,13 @@ export const actions = {
       }
     })
   },
-  disconnectWallet({}, provider) {
-    provider.wc._handshakeTopic = ""
-    provider.isConnecting = false
+  async disconnectWallet({getters}, provider) {
+    let walletProvider = provider
+    if (!walletProvider) {
+      walletProvider = getters.walletConnectProvider
+    }
+    walletProvider.wc._handshakeTopic = ""
+    walletProvider.isConnecting = false
   },
   async createWalletConnect({state, getters, commit, dispatch}) {
     const provider = getters.walletConnectProvider
@@ -159,6 +163,8 @@ export const actions = {
       dispatch('addEventHandlerForWalletProvider', provider)
 
       if (localStorage.getItem('walletconnect') || isConnect) {
+        provider.wc._handshakeTopic = ""
+        provider.isConnecting = false
         await provider.enable();
       }
       window.web3 = new Web3(provider);
