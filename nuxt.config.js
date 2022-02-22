@@ -36,16 +36,30 @@ export default {
   components: true,
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
-  buildModules: ['@nuxtjs/style-resources'],
+  buildModules: ['@nuxtjs/style-resources', '@nuxtjs/google-analytics'],
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
+    '@nuxtjs/gtm',
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {},
+
+  googleAnalytics: {
+    id: 'G-4PZSHDQHZP',
+    layer: 'dataLayer',
+    pageTracking: true
+  },
+
+  gtm: {
+    id: 'GTM-WR8Q7LM',
+    layer: 'dataLayer',
+    pageTracking: true,
+    enabled: true
+  },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {

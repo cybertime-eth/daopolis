@@ -1,14 +1,17 @@
 import Web3 from 'web3'
 import { ethers, BigNumber } from 'ethers'
 import WalletConnectProvider from "@walletconnect/web3-provider";
+import { uuid } from "@walletconnect/utils";
 import daosABI from '../abi/daos.json'
 import { WHITELIST_ADDRESSES } from '@/constants'
 const ContractKit = require('@celo/contractkit')
+const axios = require('axios')
 export const state = () => ({
   daosContract: '0xc4ea80deCA2415105746639eC16cB0cF8378996A',
   fullAddress: null,
   address: null,
   chainId: null,
+  walletUri: null,
   wrongNetwork: false,
   saleOpened: false,
   mintCount: 5,
@@ -17,31 +20,43 @@ export const state = () => ({
   rejectBuyNft: false,
   successAddedNetwork: false,
   successPurchasedNft: false,
-  nftList: []
+  nftList: [],
 })
 
 export const getters = {
-  provider() {
-    const web3 = window.web3 && window.web3.eth && window.web3.eth.currentProvider.connected ? window.web3.eth : window.ethereum
-    if (web3) {
-      return new ethers.providers.Web3Provider(web3);
-    } else {
-      return new Web3.providers.HttpProvider('https://alfajores-forno.celo-testnet.org')
-    }
+  walletConnectProvider() {
+    return new WalletConnectProvider({
+      rpc: {
+        42220: "https://forno.celo.org"
+      },
+      qrcodeModalOptions: {
+        mobileLinks: !window.ethereum ? ['metamask', 'valora'] : []
+      },
+      // qrcodeModalOptions: {
+      //   mobileLinks: ['metamask', 'trust', 'safepal', 'math']
+      // },
+    })
+  },
+  provider(state, getters) {
+    return window.ethereum || getters.walletConnectProvider
   }
 }
 
 export const actions = {
   async updateUser({state, getters, commit, dispatch}) {
+    if (!getters.provider) return
     if (localStorage.getItem('address') && !localStorage.getItem('walletconnect')) {
       try {
         const provider = getters.provider
-        const signer = await provider.getSigner()
+        const web3Provider = new ethers.providers.Web3Provider(provider)
+        const signer = await web3Provider.getSigner()
         const address = await signer.getAddress()
-        const chain = await provider.getNetwork()
-        window.ethereum.on("chainChanged", async (chainId) => {
+        const chain = await web3Provider.getNetwork()
+        provider.on("chainChanged", async (chainId) => {
           dispatch('updateChainId', BigNumber.from(chainId).toNumber())
-          dispatch('updateTotalMintCount')
+          if (state.totalMintCount === 0 || chainId !== state.chainId) {
+            dispatch('updateTotalMintCount')
+          }
         })
 
         commit('setAddress', address)
@@ -53,6 +68,7 @@ export const actions = {
           dispatch('getCollection')
         }
       } catch(e) {
+        console.log(e)
         localStorage.removeItem('address')
       }
     }
@@ -63,18 +79,22 @@ export const actions = {
     commit('setSuccessAddedNetwork', false)
   },
   async updateTotalMintCount({commit, state, getters}) {
-    if (!state.fullAddress || state.chainId !== 42220) return
-    const web3 = new Web3(window.ethereum)
-    const kit = ContractKit.newKitFromWeb3(web3)
-    const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
-    const totalSupply = await contract.methods.totalSupply().call()
-    commit('setTotalMintCount', totalSupply)
+    if (!state.fullAddress || !getters.provider || state.chainId !== 42220) return
+    try {
+      const web3 = new Web3(getters.provider)
+      const kit = ContractKit.newKitFromWeb3(web3)
+      const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
+      const totalSupply = await contract.methods.totalSupply().call()
+      commit('setTotalMintCount', totalSupply)
+    } catch(e) {
+      console.log(e)
+    }
   },
   async connectMetaTrust({getters, commit, dispatch}) {
     try {
       if (window.ethereum) {
         await window.ethereum.request({ method: 'eth_requestAccounts' })
-        const provider = getters.provider
+        const provider = new ethers.providers.Web3Provider(window.ethereum)
         const address = await provider.getSigner().getAddress();
         const chain = await provider.getNetwork()
         commit('setAddress', address)
@@ -87,24 +107,71 @@ export const actions = {
       throw new Error(error);
     }
   },
-  async walletConnect({commit}, isConnect) {
-    const provider = new WalletConnectProvider({
-      rpc: {
-        44787: "https://alfajores-forno.celo-testnet.org"
-      },
-      qrcodeModalOptions: {
-        mobileLinks: ['metamask', 'trust', 'safepal', 'math']
-      },
-    });
-    provider.on("accountsChanged", (accounts) => {
+  addEventHandlerForWalletProvider({state, commit, dispatch}, provider) {
+    provider.on("accountsChanged", async (accounts) => {
       commit('setAddress', accounts[0])
+      dispatch('updateTotalMintCount')
+      if ($nuxt.$route.name === 'collection') {
+        dispatch('getCollection')
+      }
     });
-    if (localStorage.getItem('walletconnect') || isConnect) {
-      await provider.enable();
+
+    provider.on("chainChanged", async (chainId) => {
+      dispatch('updateChainId', BigNumber.from(chainId).toNumber())
+      if (state.totalMintCount === 0 || chainId !== state.chainId) {
+        dispatch('updateTotalMintCount')
+      }
+    })
+  },
+  disconnectWallet({}, provider) {
+    provider.wc._handshakeTopic = ""
+    provider.isConnecting = false
+  },
+  async createWalletConnect({state, getters, commit, dispatch}) {
+    const provider = getters.walletConnectProvider
+    const wc = provider.wc
+    dispatch('addEventHandlerForWalletProvider', provider)
+
+    // create session
+    wc._key = await wc._generateKey()
+    const request = wc._formatRequest({
+      method: "wc_sessionRequest",
+      params: [
+        {
+          peerId: wc.clientId,
+          peerMeta: wc.clientMeta,
+          chainId: state.chainId,
+        }
+      ],
+    })
+    wc.handshakeId = request.id
+    wc.handshakeTopic = uuid()
+    wc._sendSessionRequest(request, "Session update rejected", { topic: wc.handshakeTopic })
+    commit('setWalletUri', wc.uri)
+    // create session end
+
+    provider.start()
+    provider.subscribeWalletConnector()
+  },
+  async walletConnect({commit, dispatch, getters}, isConnect) {
+    const provider = getters.walletConnectProvider
+    try {
+      dispatch('addEventHandlerForWalletProvider', provider)
+
+      if (localStorage.getItem('walletconnect') || isConnect) {
+        await provider.enable();
+      }
+      window.web3 = new Web3(provider);
+    } catch(e) {
+      console.log(e)
+      dispatch('disconnectWallet', provider)
     }
-    window.web3 = new Web3(provider);
   },
   async addCeloNetwork({commit, state}) {
+    if (!window.ethereum) {
+      alert('Please switch network manaully')
+      return
+    }
     try {
       await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{"chainId": '0xa4ec'}] })
       commit('setSuccessAddedNetwork', true)
@@ -137,15 +204,20 @@ export const actions = {
       }
     }
   },
-  async getBalance({state}) {
-    const web3 = new Web3(window.ethereum)
+  async getBalance({state, getters}) {
+    if (!state.fullAddress || !getters.provider) return
+    const web3 = new Web3(getters.provider)
     const kit = ContractKit.newKitFromWeb3(web3)
     const res = await kit.getTotalBalance(state.fullAddress)
     return res.CELO.c[0] / 10000
   },
   async getCollection({commit, state}, fetchMints = false) {
     if (state.fullAddress) {
-      const web3 = new Web3(window.ethereum)
+      let provider = window.ethereum
+      if (!provider) {
+        provider = new Web3.providers.HttpProvider('https://forno.celo.org')
+      }
+      const web3 = new Web3(provider)
       const kit = ContractKit.newKitFromWeb3(web3)
       const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
       const result = await contract.methods.tokensOfOwner(state.fullAddress).call()
@@ -157,8 +229,7 @@ export const actions = {
         const orderedResult = [...result].sort((a, b) => parseInt(a) - parseInt(b))
         orderedResult.slice(-fetchCount).forEach(tokenId => promises.push(contract.methods.tokenURI(tokenId).call()))
         const uriList = await Promise.all(promises)
-
-        uriList.forEach(tokenURI => nftPromises.push(this.$axios.get(tokenURI)))
+        uriList.forEach(tokenURI => nftPromises.push(axios.get(tokenURI)))
         const nftResultList = await Promise.all(nftPromises)
 
         nftResultList.forEach(nftResult => {
@@ -173,7 +244,9 @@ export const actions = {
   },
   async buyNft({commit, getters, state, dispatch}) {
     try {
-      const web3 = new Web3(window.ethereum)
+      const web3Provider = getters.provider
+      const provider = new ethers.providers.Web3Provider(web3Provider);
+      const web3 = new Web3(web3Provider)
       const accounts = await web3.eth.getAccounts()
       const account = accounts[0]
       const kit = ContractKit.newKitFromWeb3(web3)
@@ -182,16 +255,18 @@ export const actions = {
       const result = await contract.methods.mint(state.fullAddress, state.mintCount).send({
         from: account,
         value: msgValue,
-        gasPrice: ethers.utils.parseUnits('0.5', 'gwei')
+        gasPrice: ethers.utils.parseUnits('0.5', 'gwei'),
+        gasLimit: 210000
       })
       console.log('mint done')
 
-      getters.provider.once(result, async () => {
+      provider.once(result, async () => {
         await dispatch('getCollection', true)
         commit('setSuccessPurchasedNft', true)
-      })
+      }) 
     } catch(e) {
       commit('setRejectBuyNft', true)
+      console.log(e)
     }
   },
   async logout({commit}) {
@@ -222,6 +297,9 @@ export const mutations = {
   },
   setChainId(state, chainId) {
     state.chainId = chainId
+  },
+  setWalletUri(state, uri) {
+    state.walletUri = uri
   },
   setWrongNetwork(state, wrongNetwork) {
     state.wrongNetwork = wrongNetwork

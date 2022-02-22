@@ -25,13 +25,15 @@
     <img src="/close.svg" alt="burger" class="header__mobile-menu" @click="closeProfileMenu" v-else>
 	  </div>
     </div>
-   <connect v-if="showConnectModal && !address" @closeModal="closeModal"/>
+   <connect v-if="showConnectModal && !address" @showValora="openValoraModal" @closeModal="closeModal"/>
+   <valoraConnect v-if="showValoraModal" @closeModal="showValoraModal = false"/>
    <profileModal v-show="showProfileMenu" @closeModal="closeModal"/>
    <profileMenuMobile v-show="showProfileMenuMobile"/>
   </header>
 </template>
 <script>
 import connect from '@/components/modals/connect'
+import valoraConnect from '@/components/modals/valoraConnect'
 import profileModal from '@/components/modals/profileModal'
 import profileMenuMobile from '@/components/modals/profileMenuMobile'
 export default {
@@ -39,13 +41,15 @@ export default {
     return {
       image: false,
       showConnectModal: false,
+      showValoraModal: false,
       showProfileMenu: false,
       showProfileMenuMobile: false,
       isMobilePlatform: false
     }
   },
   components: {
-	connect,
+  connect,
+  valoraConnect,
 	profileModal,
 	profileMenuMobile
   },
@@ -79,7 +83,11 @@ export default {
     closeModal(payload) {
       this.showConnectModal = payload
       this.showProfileMenu = payload
-	},
+  },
+  openValoraModal() {
+    this.showValoraModal = true
+    this.showConnectModal = false
+  },
 	openProfileMenu() {
 	  document.querySelector('.header').classList.add('fixed')
 	  this.showProfileMenuMobile = true

@@ -1,7 +1,7 @@
 <template>
   <section id="home">
     <div class="home container-xl" :class="{'wrong-network': wrongNetwork}">
-      <video src="/daopolis-movie.MP4" class="home__image" autoplay muted loop></video>
+      <video src="/daopolis-movie.MP4" class="home__image" autoplay muted loop playsinline></video>
       <div class="home__info">
         <h1 class="home__info-name">Meet Daopolis Citizens</h1>
         <h3 class="home__info-description">Automatically generated 9192 NFT's. Born in the CyberTime era, Daopolis citizens will be the foundation of a new gaming metaverse on Celo. Find your digital avatar, gain access to a private club and participate in unique NFT games!</h3>
@@ -90,7 +90,8 @@
     </div>
     <Footer />
     <Loading v-if="showLoadAlertModal" @closeModal="closeModal" />
-	<connect v-if="showConnectModal && !isConnected" @closeModal="closeModal"/>
+		<connect v-if="showConnectModal && !isConnected" @showValora="openValoraModal" @closeModal="closeModal"/>
+		<ValoraConnect v-if="showValoraModal" @closeModal="showValoraModal = false"/>
     <Error v-if="showErrorModal" @closeModal="closeErrorModal" />
     <Purchased v-if="showPurchasedModal" @closeModal="closePurchasedModal" :openCard="false"/>
   </section>
@@ -99,6 +100,7 @@
 import Footer from '@/components/Footer'
 import Loading from '@/components/modals/loading'
 import Connect from '@/components/modals/connect'
+import ValoraConnect from '@/components/modals/valoraConnect'
 import Error from '@/components/modals/error'
 import Purchased from '@/components/modals/purchased'
 import { DISTRIBUTED_CELO_PRICES, SALE_START_TIME, SALE_TIMEZONE_UTC, OPEN_SALE_HOURS } from '@/constants'
@@ -107,7 +109,8 @@ export default {
     return {
 	  showAlertLoad: false,
 	  showManualNetwork: false,
-	  showConnectModal: false,
+		showConnectModal: false,
+		showValoraModal: false,
       countMinted: 1650,
       maxCountMinted: 8846,
 	  widthLine: 33,
@@ -209,6 +212,9 @@ export default {
         this.$store.commit('setSaleOpened', true)
       }
 	}
+		if (this.balance === 0) {
+			this.updateBalance()
+		}
   },
   methods: {
 	async updateBalance() {
@@ -222,6 +228,10 @@ export default {
 	},
 	handleClickBuyCount(count) {
 	  this.$store.commit('setMintCount', count)
+	},
+	openValoraModal() {
+		this.showValoraModal = true
+		this.showConnectModal = false
 	},
     closeModal(paylaod) {
 	  this.showConnectModal = paylaod
@@ -252,6 +262,7 @@ export default {
   },
   components: {
 	Connect,
+	ValoraConnect,
     Footer,
     Loading,
     Error,
