@@ -249,11 +249,12 @@ export const actions = {
       const kit = ContractKit.newKitFromWeb3(web3)
       const contract = new kit.web3.eth.Contract(daosABI, state.daosContract)
       const msgValue = state.totalMintCount < 2000 ? '0' : web3.utils.toWei((state.celoPrice * state.mintCount).toString())
+      const gasLimit = await contract.methods.mint(state.fullAddress, state.mintCount).estimateGas({from: account, value: msgValue})
       const result = await contract.methods.mint(state.fullAddress, state.mintCount).send({
         from: account,
         value: msgValue,
         gasPrice: ethers.utils.parseUnits('0.5', 'gwei'),
-        gasLimit: 210000
+        gasLimit
       })
       console.log('mint done')
 
