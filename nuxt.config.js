@@ -29,6 +29,7 @@ export default {
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
     '@/plugins/components.client.js',
+    '@/plugins/analytics.client.js',
     '@/plugins/utils.js'
   ],
 
@@ -36,13 +37,12 @@ export default {
   components: true,
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
-  buildModules: ['@nuxtjs/style-resources', '@nuxtjs/google-analytics'],
+  buildModules: ['@nuxtjs/style-resources'],
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
-    '@nuxtjs/gtm',
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
