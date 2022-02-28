@@ -48,19 +48,6 @@ export default {
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {},
 
-  googleAnalytics: {
-    id: 'G-4PZSHDQHZP',
-    layer: 'dataLayer',
-    pageTracking: true
-  },
-
-  gtm: {
-    id: 'GTM-WR8Q7LM',
-    layer: 'dataLayer',
-    pageTracking: true,
-    enabled: true
-  },
-
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
     cache: false,
