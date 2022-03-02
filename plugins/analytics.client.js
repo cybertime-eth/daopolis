@@ -1,6 +1,6 @@
 export default() => {
 	const script = document.createElement('script')
-	script.src = 'https://www.googletagmanager.com/gtag/js?id=G-4PZSHDQHZP'
+	script.src = 'https://www.googletagmanager.com/gtag/js?id=G-DM5SE2DHTD'
 	script.async = true
 	document.head.appendChild(script)
 
@@ -9,14 +9,14 @@ export default() => {
 		dataLayer.push(arguments)
 	}
 	gtag('js', new Date())
-	gtag('config', 'G-4PZSHDQHZP')
+	gtag('config', 'G-DM5SE2DHTD')
 
 	const script2 = document.createElement('script')
 	script2.innerHTML = `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-        })(window,document,'script','dataLayer','GTM-WR8Q7LM');
+		new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+		j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+		'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+		})(window,document,'script','dataLayer','GTM-MB9DPKN');
 	`
 	document.head.appendChild(script2)
 }
